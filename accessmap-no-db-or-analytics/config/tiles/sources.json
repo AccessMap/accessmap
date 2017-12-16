@@ -1,0 +1,28 @@
+{
+  "pedestrian": {
+    "sidewalks": [
+        "SELECT 'Feature' AS type,",
+        "       ST_AsGeoJSON(ST_Transform(geom, 4326), 7)::json geometry,",
+        "       json_build_object('grade', grade) properties",
+        "  FROM sidewalks"],
+    "crossings": [
+        "SELECT 'Feature' AS type,",
+        "       ST_AsGeoJSON(ST_Transform(geom, 4326), 7)::json geometry,",
+        "       json_build_object('grade', grade,",
+        "                         'curbramps', curbramps) properties",
+        "          FROM crossings"]
+  },
+  "live": {
+    "construction": [
+        "SELECT 'Feature' AS type,",
+        "       ST_AsGeoJSON(ST_Transform(geom, 4326), 7)::json geometry,",
+        "       json_build_object('address', address,",
+        "                         'permit_number', permit_number,",
+        "                         'start_date', to_char(start_date, 'YYYY-MM-DD'),",
+        "                         'end_date', to_char(end_date, 'YYYY-MM-DD'),",
+        "                         'closed', closed) properties",
+        "  FROM construction",
+        " WHERE start_date <= current_timestamp",
+        "   AND end_date >= current_timestamp"]
+  }
+}
