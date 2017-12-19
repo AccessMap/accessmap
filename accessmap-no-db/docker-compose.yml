@@ -1,0 +1,67 @@
+version: '3.2'
+
+services:
+
+  rakamdb:
+    image: postgres:9.6.1
+    environment:
+      - POSTGRES_USER=rakam
+      - POSTGRES_PASSWORD=dummy
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "6666:5432"
+    volumes:
+      - "/docker/rakamdb:/var/lib/postgresql/data/pgdata"
+
+  rakam:
+    build: ./rakam-waitfor
+    environment:
+      - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://rakam:dummy@rakamdb:5432/rakam
+      - RAKAM_CONFIG_LOCK__KEY=${RAKAM_CONFIG_LOCK__KEY:-mylockKey}
+      - WAITFOR=rakamdb:5432
+    ports:
+      - "9999:9999"
+    depends_on:
+      - rakamdb
+
+  api:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#develop
+    command: python3 ./runserver.py
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "5555:5555"
+
+  tiles:
+    build:
+      context: https://github.com/accessmap/accessmap-vt.git
+    command: yarn app 0.0.0.0
+    restart: always
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DOCKER=no
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./config/tiles/sources.json:/www/sources.json
+
+  webapp:
+    build:
+      context: https://github.com/accessmap/accessmap-webapp.git#feature/analytics
+    # Note: binding 0.0.0.0 isn't a big security issue in this case, as all
+    # external traffic has to go through the host first.
+    command: yarn start --host=0.0.0.0
+    restart: always
+    links:
+      - api
+      - tiles
+    environment:
+      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
+      - ANALYTICS_SERVER=http://rakam:9999
+      - ANALYTICS_KEY=${ANALYTICS_KEY}
+      - APISERVER=http://api:5555
+      - TILESERVER=http://tiles:3001
+    ports:
+      - 3000:3000
