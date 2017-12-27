@@ -5,8 +5,8 @@ services:
   rakamdb:
     image: postgres:9.6.1
     environment:
-      - POSTGRES_USER=rakam
-      - POSTGRES_PASSWORD=dummy
+      - POSTGRES_USER=${RAKAMDB_USER:-rakam}
+      - POSTGRES_PASSWORD=${RAKAMDB_PASSWORD:-dummy}
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - "6666:5432"

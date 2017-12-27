@@ -55,6 +55,12 @@ it from `.env_sample`: `cp .env_sample .env`:
   - MAPBOX_TOKEN: A Mapbox token for your deployment, lets you use their
   vector tiles for your map.
 
+If you are running this in production (you probably shouldn't, yet), make sure
+to change the database username/password as well using the `RAKAMDB_USER` and
+`RAKAMDB_PASSWORD` environment variables. Note that this has no effect if you
+have already created and persisted the database (you'll need to change this
+info manually in postgres or recreate the database entirely).
+
 2. Start the services: `docker-compose up`.
 
 3. Create a new analytics project. Rakam uses web requests for all setup, so
