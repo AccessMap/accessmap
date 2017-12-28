@@ -1,0 +1,35 @@
+version: '3.2'
+
+services:
+
+  rakamdb:
+    environment:
+      - POSTGRES_USER=rakam
+      - POSTGRES_PASSWORD=dummy
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 6666:5432
+    volumes:
+      - "${DB_VOLUME:-/docker/rakamdb}:/var/lib/postgresql/data/pgdata"
+
+  rakam:
+    environment:
+      - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://rakam:dummy@rakamdb:5432/rakam
+      - RAKAM_CONFIG_LOCK__KEY=mylockKey
+    ports:
+      - 9999:9999
+
+  api:
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - 5555:5555
+
+  tiles:
+    ports:
+      - 3001:3001
+
+  webapp:
+    command: yarn start --host 0.0.0.0
+    ports:
+      - 3000:3000
