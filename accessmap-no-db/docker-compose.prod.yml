@@ -28,7 +28,12 @@ services:
     restart: always
 
   webapp:
-    command: yarn prod --host 0.0.0.0
     restart: always
+
+  caddy:
+    volumes:
+      - ./config/Caddyfile.prod:/etc/Caddyfile
+      - /docker/.caddy:/root/.caddy
     ports:
-      - 3000:3000
+      - 80:80
+      - 443:443

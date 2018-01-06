@@ -1,0 +1,36 @@
+localhost:80, www.accessmap.io, accessmap.io {
+    proxy / webapp:3000 {
+        transparent
+    }
+
+    rewrite {
+        if {>Referer} has /tiles
+        to /tiles/{path}
+    }
+
+    proxy /analytics rakam:9999 {
+        without /analytics
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    proxy /api api:5555 {
+        without /api
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    proxy /tiles tiles:3001 {
+        without /tiles
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    gzip
+    # Log to places that journalctl will find
+    log stdout
+    errors stderr
+}

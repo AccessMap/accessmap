@@ -30,6 +30,11 @@ services:
       - 3001:3001
 
   webapp:
-    command: yarn start --host 0.0.0.0
     ports:
       - 3000:3000
+
+  caddy:
+    volumes:
+      - ./config/Caddyfile.dev:/etc/Caddyfile
+    ports:
+      - 2015:2015
