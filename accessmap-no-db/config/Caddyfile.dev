@@ -1,9 +1,7 @@
 localhost {
     tls off
 
-    proxy / webapp:3000 {
-        transparent
-    }
+    root /webapp
 
     rewrite {
         if {>Referer} has /tiles

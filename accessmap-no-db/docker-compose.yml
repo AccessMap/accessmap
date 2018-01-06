@@ -30,9 +30,15 @@ services:
   webapp:
     build:
       context: https://github.com/accessmap/accessmap-webapp.git#develop
-    command: yarn prod --host 0.0.0.0
+    command: yarn build
     # Note: binding 0.0.0.0 isn't a big security issue in this case, as all
     # external traffic has to go through the host first.
+    volumes:
+      - type: volume
+        source: webapp-build
+        target: /www/public
+        volume:
+          nocopy: true
     links:
       - api
       - tiles
@@ -45,8 +51,15 @@ services:
 
   caddy:
     image: abiosoft/caddy:0.10.10
+    volumes:
+      - type: volume
+        source: webapp-build
+        target: /webapp
     links:
       - api
       - rakam
       - tiles
       - webapp
+
+volumes:
+  webapp-build:

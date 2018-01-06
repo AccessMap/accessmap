@@ -1,7 +1,5 @@
 localhost:80, www.accessmap.io, accessmap.io {
-    proxy / webapp:3000 {
-        transparent
-    }
+    root /webapp
 
     rewrite {
         if {>Referer} has /tiles

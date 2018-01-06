@@ -29,10 +29,6 @@ services:
     ports:
       - 3001:3001
 
-  webapp:
-    ports:
-      - 3000:3000
-
   caddy:
     volumes:
       - ./config/Caddyfile.dev:/etc/Caddyfile
