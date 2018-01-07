@@ -20,14 +20,8 @@ services:
       - 9999:9999
 
   api:
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
     ports:
       - 5555:5555
-
-  tiles:
-    ports:
-      - 3001:3001
 
   caddy:
     volumes:

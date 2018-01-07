@@ -6,48 +6,39 @@ services:
     image: postgres:9.6.1
 
   rakam:
-    build: ./rakam-waitfor
+    build: ./builds/rakam-waitfor
     environment:
       - WAITFOR=rakamdb:5432
     depends_on:
       - rakamdb
 
+  fetch_and_tippecanoe:
+    build: ./builds/tippecanoe-curl
+    entrypoint: sh /fetch_and_build_tiles.sh /home/tippecanoe/data
+    volumes:
+      - ./scripts/fetch_and_build_tiles.sh:/fetch_and_build_tiles.sh
+      - ${AM_DATADIR:-/docker/amdata}:/home/tippecanoe/data
+
   api:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
-    command: python3 ./runserver.py
-
-  tiles:
-    build:
-      context: https://github.com/accessmap/accessmap-vt.git
-    command: yarn app 0.0.0.0
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - DOCKER=no
+      context: https://github.com/accessmap/accessmap-api.git#feature/networkx
+    command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi:app
     volumes:
-      - ./config/tiles/sources.json:/www/sources.json
+      - ${AM_DATADIR:-/docker/amdata}:/www/data
 
   webapp:
     build:
       context: https://github.com/accessmap/accessmap-webapp.git#develop
     command: yarn build
-    # Note: binding 0.0.0.0 isn't a big security issue in this case, as all
-    # external traffic has to go through the host first.
     volumes:
       - type: volume
         source: webapp-build
         target: /www/public
         volume:
           nocopy: true
-    links:
-      - api
-      - tiles
     environment:
       - MAPBOX_TOKEN=${MAPBOX_TOKEN}
-      - ANALYTICS_SERVER=http://rakam:9999
       - ANALYTICS_KEY=${ANALYTICS_KEY}
-      - APISERVER=http://api:5555
-      - TILESERVER=http://tiles:3001
 
   caddy:
     image: abiosoft/caddy:0.10.10
@@ -55,11 +46,10 @@ services:
       - type: volume
         source: webapp-build
         target: /webapp
+      - ${AM_DATADIR:-/docker/amdata}:/amdata
     links:
       - api
       - rakam
-      - tiles
-      - webapp
 
 volumes:
   webapp-build:

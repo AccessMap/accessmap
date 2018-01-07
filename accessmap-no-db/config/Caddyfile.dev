@@ -3,11 +3,6 @@ localhost {
 
     root /webapp
 
-    rewrite {
-        if {>Referer} has /tiles
-        to /tiles/{path}
-    }
-
     proxy /analytics rakam:9999 {
         without /analytics
         header_downstream Host {host}
@@ -22,14 +17,29 @@ localhost {
         header_downstream X-Forwarded-Proto {scheme}
     }
 
-    proxy /tiles tiles:3001 {
-        without /tiles
-        header_downstream Host {host}
-        header_downstream X-Real-IP {remote}
-        header_downstream X-Forwarded-Proto {scheme}
+    gzip
+
+    log stdout
+    errors stderr
+}
+
+localhost/tiles {
+    root /amdata/tiles
+
+    # Files are already gzipped, but need to fix headers
+    header / {
+        Content-Encoding gzip
     }
 
-    gzip
+    # If file can't be found, return 204. This is the expected behavior for
+    # vector tiles when using mapbox-gl-js so that it can distinguish
+    # accidentally missing data (404) from areas not intended to have data
+    # (204)
+    rewrite /tiles {
+        to {path} /nocontent
+    }
+    status 204 /nocontent
+
     # Log to places that journalctl will find
     log stdout
     errors stderr
