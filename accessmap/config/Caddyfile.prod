@@ -16,6 +16,7 @@ localhost:80, www.accessmap.io, accessmap.io {
     }
 
     gzip
+
     log stdout
     errors stderr
 }
@@ -23,22 +24,23 @@ localhost:80, www.accessmap.io, accessmap.io {
 localhost/tiles {
     root /amdata/tiles
 
-    # Files are already gzipped, but need to fix headers
     header / {
         Content-Type application/vnd.mapbox-vector-tile
         Content-Encoding gzip
     }
 
-    # If file can't be found, return 204. This is the expected behavior for
-    # vector tiles when using mapbox-gl-js so that it can distinguish
-    # accidentally missing data (404) from areas not intended to have data
-    # (204)
-    rewrite /tiles {
-        to {path} /nocontent
+    header /nocontent {
+        -Content-Type
+        -Content-Encoding
     }
+
     status 204 /nocontent
 
+    rewrite {
+      to {rewrite_path} /nocontent
+    }
+
     # Log to places that journalctl will find
-    log stdout
-    errors stderr
+    log / stdout "{remote} - {user} [{when}] \"{method} {uri} {proto}\" {status} {size} - {path} -> {rewrite_path}"
+    # errors stderr
 }
