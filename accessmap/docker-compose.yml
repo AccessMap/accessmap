@@ -6,11 +6,11 @@ services:
     image: postgres:9.6.1
 
   rakam:
-    build: ./builds/rakam-waitfor
-    environment:
-      - WAITFOR=rakamdb:5432
+    build: ./builds/rakam
     depends_on:
       - rakamdb
+    environment:
+      - WAITFOR=rakamdb:5432
 
   fetch_and_tippecanoe:
     build: ./builds/tippecanoe-curl
