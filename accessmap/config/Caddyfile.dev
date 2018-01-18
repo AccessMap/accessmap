@@ -28,6 +28,7 @@ localhost/tiles {
 
     # Files are already gzipped, but need to fix headers
     header / {
+        Content-Type application/vnd.mapbox-vector-tile
         Content-Encoding gzip
     }
 
