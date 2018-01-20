@@ -69,7 +69,9 @@ proxied by the `accessmap-webapp` project, so these commands can be carried
 out remotely so long as you have access to it, at `<base_url>/analytics`. The
 following example uses `curl` on the local server:
 
-    curl --request POST --url http://localhost:9999/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
+    curl --request POST --url http://localhost:2015/analytics/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
+
+Note: if you're running the production configuration, use localhost:80 instead.
 
 The response will include a `master_key` and `write_key`. Write these down /
 save them in a secure location.
