@@ -24,9 +24,6 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     restart: always
 
-  tiles:
-    restart: always
-
   webapp:
     restart: always
 
