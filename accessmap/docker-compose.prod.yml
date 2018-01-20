@@ -4,7 +4,7 @@ services:
 
   rakamdb:
     environment:
-      - POSTGRES_USER=${RAKAMDB_USER}
+      - POSTGRES_USER=rakam
       - POSTGRES_PASSWORD=${RAKAMDB_PASSWORD}
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
@@ -15,7 +15,7 @@ services:
 
   rakam:
     environment:
-      - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://${RAKAMDB_USER}:${RAKAMDB_PASSWORD}@rakamdb:5432/rakam
+      - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://rakam:${RAKAMDB_PASSWORD}@rakamdb:5432/rakam
       - RAKAM_CONFIG_LOCK__KEY=${RAKAM_CONFIG_LOCK__KEY}
     restart: always
 
