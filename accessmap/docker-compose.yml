@@ -21,7 +21,7 @@ services:
 
   api:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#feature/networkx
+      context: https://github.com/accessmap/accessmap-api.git#develop
     command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi:app
     volumes:
       - ${AM_DATADIR:-/docker/amdata}:/www/data
