@@ -1,7 +1,7 @@
 set -e
 
 datadir=$1
-branch=feature/snakemake
+branch=develop
 
 # Fetch the data
 curl -L -o ${datadir}/sidewalks.geobuf https://github.com/AccessMap/accessmap-data/raw/$branch/cities/seattle/output/sidewalks_network.geobuf

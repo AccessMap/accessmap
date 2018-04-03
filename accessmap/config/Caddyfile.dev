@@ -1,4 +1,4 @@
-localhost {
+0.0.0.0, localhost {
     root /webapp
 
     proxy /analytics rakam:9999 {
@@ -23,7 +23,7 @@ localhost {
     tls off
 }
 
-localhost/tiles {
+0.0.0.0/tiles, localhost/tiles {
     root /amdata/tiles
 
     header / {
