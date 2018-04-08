@@ -22,6 +22,8 @@ services:
   api:
     ports:
       - 5555:5555
+    environment:
+      - SERVER_PORT=5555
 
   caddy:
     volumes:

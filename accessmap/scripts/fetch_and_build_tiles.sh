@@ -14,7 +14,7 @@ wait
 mkdir -p ${datadir}/tiles
 
 # Build tiles
-tippecanoe -f -B 17 -z 17 -Z 12 -r 0 \
+tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
     -L sidewalks:${datadir}/sidewalks.geobuf \
     -L crossings:${datadir}/crossings.geobuf \
     -L elevator_paths:${datadir}/elevator_paths.geobuf \
