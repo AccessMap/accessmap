@@ -26,6 +26,8 @@ services:
 
   webapp:
     restart: always
+    environment:
+      - OPENID_CLIENT_ID=AccessMap
 
   caddy:
     volumes:
