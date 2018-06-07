@@ -32,14 +32,9 @@ version of `docker-compose` (they were initially developed with v1.15).
 Running the containers should require only `docker` and `docker-compose`.
 Doing some of the follow-up setup may require `curl`.
 
-### accessmap-no-db
+### Setup
 
-This deployment launches all services necessary to run AccessMap Seattle
-except for the routing database.
-
-#### Setup
-
-Setting up this mostly-full deployment is a two-step process, as the analytics
+Setting up this deployment is a two-step process, as the analytics
 server requires a bit of setup and creating some credentials, and then the
 webapp needs to know those credentials and get restarted (i.e. the
 docker-compose file needs to be edited).
@@ -54,6 +49,8 @@ it from `.env_sample`: `cp .env_sample .env`:
   database URI.
   - MAPBOX_TOKEN: A Mapbox token for your deployment, lets you use their
   vector tiles for your map.
+  - OPENID_CLIENT_ID: The client ID value that is registered with OpenToAll accounts.
+  This is only necessary if you want logins to work.
 
 If you are running this in production (you probably shouldn't, yet), make sure
 to change the database username/password as well using the `RAKAMDB_USER` and
