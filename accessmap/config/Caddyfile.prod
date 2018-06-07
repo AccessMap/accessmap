@@ -1,6 +1,12 @@
 localhost:80, www.accessmap.io, accessmap.io {
     root /webapp
 
+    rewrite / {
+      if {path} not_match ^/analytics
+      if {path} not_match ^/api
+      to {path} /
+    }
+
     proxy /analytics rakam:9999 {
         without /analytics
         header_downstream Host {host}
