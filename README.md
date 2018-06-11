@@ -58,7 +58,9 @@ to change the database username/password as well using the `RAKAMDB_USER` and
 have already created and persisted the database (you'll need to change this
 info manually in postgres or recreate the database entirely).
 
-2. Start the services: `docker-compose up`.
+2. Start the services: `docker-compose up`. Note: to run in production or staging mode,
+add docker-compose config cascading, e.g.:
+`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
 
 3. Create a new analytics project. Rakam uses web requests for all setup, so
 you can use whatever tool you prefer. Also, note that the analytics server is
