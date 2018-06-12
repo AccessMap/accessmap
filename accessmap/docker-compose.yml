@@ -37,6 +37,7 @@ services:
     command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
     volumes:
       - ${AM_DATADIR:-/docker/amdata}:/www/data
+      - ./config/layers.json:/www/layers.json
 
   webapp:
     build:
