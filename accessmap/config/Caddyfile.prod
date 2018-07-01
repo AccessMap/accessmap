@@ -1,4 +1,4 @@
-www.accessmap.io, accessmap.io {
+uw.accessmap.io {
     root /webapp
 
     rewrite / {
@@ -27,7 +27,7 @@ www.accessmap.io, accessmap.io {
     errors stderr
 }
 
-www.accessmap.io/tiles, accessmap.io/tiles {
+uw.accessmap.io/tiles {
     root /amdata/tiles
 
     header / {

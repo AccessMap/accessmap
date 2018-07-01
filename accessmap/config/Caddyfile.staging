@@ -1,4 +1,4 @@
-staging.accessmap.io {
+uwstaging.accessmap.io {
     root /webapp
 
     rewrite / {
@@ -27,7 +27,7 @@ staging.accessmap.io {
     errors stderr
 }
 
-staging.accessmap.io/tiles {
+uwstaging.accessmap.io/tiles {
     root /amdata/tiles
 
     header / {
