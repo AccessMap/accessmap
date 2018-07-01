@@ -1,31 +1,24 @@
 {
   "crossing": {
-    "path": "crossings.geobuf",
+    "path": "crossings.geojson",
     "properties": {
-      "curbramps": { "type": "integer" },
-      "incline": { "type": "integer", "inverts": true },
-      "length": { "type": "real" },
-      "marked": { "type": "integer" },
-      "street_name": { "type": "varchar" }
+      "crossing": { "type": "varchar" }
     }
   },
   "sidewalk": {
-    "path": "sidewalks.geobuf",
+    "path": "sidewalks.geojson",
     "properties": {
       "incline": { "type": "integer", "inverts": true },
-      "layer": { "type": "integer" },
       "length": { "type": "real" },
-      "side": { "type": "varchar" },
-      "street_name": { "type": "varchar" }
+      "surface": { "type": "varchar" }
     }
   },
-  "elevator_path": {
-    "path": "elevator_paths.geobuf",
+  "footway": {
+    "path": "footways.geojson",
     "properties": {
-      "indoor": { "type": "integer" },
+      "incline": { "type": "integer", "inverts": true },
       "length": { "type": "real" },
-      "opening_hours": { "type": "varchar" },
-      "via": { "type": "varchar" }
+      "surface": { "type": "varchar" }
     }
   }
 }

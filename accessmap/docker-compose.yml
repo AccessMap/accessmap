@@ -13,7 +13,7 @@ services:
 
   api_build:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
+      context: https://github.com/accessmap/accessmap-api.git#uw
     depends_on:
       - tippecanoe
     command: python build.py
@@ -23,7 +23,7 @@ services:
 
   api:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
+      context: https://github.com/accessmap/accessmap-api.git#uw
     depends_on:
       - api_build
     command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
