@@ -12,21 +12,21 @@ services:
     environment:
       - WAITFOR=rakamdb:5432
 
-  fetch_and_tippecanoe:
-    build: ./builds/tippecanoe-curl
-    entrypoint: sh /fetch_and_build_tiles.sh /home/tippecanoe/data
+  tippecanoe:
+    build: ./builds/tippecanoe
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data
     volumes:
-      - ./scripts/fetch_and_build_tiles.sh:/fetch_and_build_tiles.sh
-      - ${AM_DATADIR:-/docker/amdata}:/home/tippecanoe/data
+      - ./scripts/build_tiles.sh:/build_tiles.sh
+      - ${AM_DATADIR:-/docker/amuwdata}:/home/tippecanoe/data
 
   api_build:
     build:
       context: https://github.com/accessmap/accessmap-api.git#develop
     depends_on:
-      - fetch_and_tippecanoe
+      - tippecanoe
     command: python build.py
     volumes:
-      - ${AM_DATADIR:-/docker/amdata}:/www/data
+      - ${AM_DATADIR:-/docker/amuwdata}:/www/data
       - ./config/layers.json:/www/layers.json
 
   api:
@@ -36,7 +36,7 @@ services:
       - api_build
     command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
     volumes:
-      - ${AM_DATADIR:-/docker/amdata}:/www/data
+      - ${AM_DATADIR:-/docker/amuwdata}:/www/data
       - ./config/layers.json:/www/layers.json
 
   webapp:
@@ -60,7 +60,7 @@ services:
       - type: volume
         source: webapp-build
         target: /webapp
-      - ${AM_DATADIR:-/docker/amdata}:/amdata
+      - ${AM_DATADIR:-/docker/amuwdata}:/amdata
     links:
       - api
       - rakam
