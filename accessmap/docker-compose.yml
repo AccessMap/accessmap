@@ -17,6 +17,8 @@ services:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data
     volumes:
       - ./scripts/build_tiles.sh:/build_tiles.sh
+      - ./config/tilejson/paths.json:/home/tippecanoe/data/paths.json
+      - ./config/tilejson/points.json:/home/tippecanoe/data/points.json
       - ${AM_DATADIR:-/docker/amuwdata}:/home/tippecanoe/data
 
   api_build:

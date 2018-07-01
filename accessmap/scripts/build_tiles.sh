@@ -17,3 +17,6 @@ tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
     -L elevators:${datadir}/elevators.geojson \
     -L kerbs:${datadir}/kerbs.geojson \
     -e ${datadir}/tiles/points
+
+cp ${datadir}/paths.json ${datadir}/tiles/paths/tile.json
+cp ${datadir}/points.json ${datadir}/tiles/points/tile.json
