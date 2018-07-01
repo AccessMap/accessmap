@@ -2,16 +2,6 @@ version: '3.2'
 
 services:
 
-  rakamdb:
-    image: postgres:9.6.1
-
-  rakam:
-    build: ./builds/rakam
-    depends_on:
-      - rakamdb
-    environment:
-      - WAITFOR=rakamdb:5432
-
   tippecanoe:
     build: ./builds/tippecanoe
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data
@@ -41,31 +31,9 @@ services:
       - ${AM_DATADIR:-/docker/amuwdata}:/www/data
       - ./config/layers.json:/www/layers.json
 
-  webapp:
-    build:
-      context: https://github.com/accessmap/accessmap-webapp.git#develop
-    command: yarn build
-    volumes:
-      - type: volume
-        source: webapp-build
-        target: /www/public
-        volume:
-          nocopy: true
-    environment:
-      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
-      - ANALYTICS_KEY=${ANALYTICS_KEY}
-      - OPENID_CLIENT_ID=${OPENID_CLIENT_ID}
-
   caddy:
     image: abiosoft/caddy:0.10.10
     volumes:
-      - type: volume
-        source: webapp-build
-        target: /webapp
       - ${AM_DATADIR:-/docker/amuwdata}:/amdata
     links:
       - api
-      - rakam
-
-volumes:
-  webapp-build:
