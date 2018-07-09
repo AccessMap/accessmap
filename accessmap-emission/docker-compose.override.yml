@@ -1,0 +1,15 @@
+version: '3.2'
+
+services:
+
+  api:
+    ports:
+      - 5555:5555
+    environment:
+      - SERVER_PORT=5555
+
+  caddy:
+    volumes:
+      - ./config/Caddyfile.dev:/etc/Caddyfile
+    ports:
+      - 2015:2015
