@@ -20,5 +20,9 @@
       "length": { "type": "real" },
       "surface": { "type": "varchar" }
     }
+  },
+  "stairs": {
+    "path": "stairs.geojson",
+    "properties": {}
   }
 }
