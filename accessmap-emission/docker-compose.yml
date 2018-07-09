@@ -1,0 +1,60 @@
+version: '3.2'
+
+services:
+
+  fetch_and_tippecanoe:
+    build: ./builds/tippecanoe-curl
+    entrypoint: sh /fetch_and_build_tiles.sh /home/tippecanoe/data
+    volumes:
+      - ./scripts/fetch_and_build_tiles.sh:/fetch_and_build_tiles.sh
+      - ${AM_DATADIR:-/docker/amdata}:/home/tippecanoe/data
+
+  api_build:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#study/emission
+    depends_on:
+      - fetch_and_tippecanoe
+    command: python build.py
+    volumes:
+      - ${AM_DATADIR:-/docker/amdata}:/www/data
+      - ./config/layers.json:/www/layers.json
+
+  api:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#study/emission
+    depends_on:
+      - api_build
+    command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
+    volumes:
+      - ${AM_DATADIR:-/docker/amdata}:/www/data
+      - ./config/layers.json:/www/layers.json
+
+  webapp:
+    build:
+      context: https://github.com/accessmap/accessmap-webapp.git#study/emission
+    command: yarn build
+    volumes:
+      - type: volume
+        source: webapp-build
+        target: /www/public
+        volume:
+          nocopy: true
+    environment:
+      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
+      - ANALYTICS_KEY=${ANALYTICS_KEY}
+      - OPENID_CLIENT_ID=${OPENID_CLIENT_ID}
+
+  caddy:
+    image: abiosoft/caddy:0.10.10
+    volumes:
+      - type: volume
+        source: webapp-build
+        target: /webapp
+      - ${AM_DATADIR:-/docker/amdata}:/amdata
+    environment:
+      - ANALYTICS_SERVER=${ANALYTICS_SERVER}
+    links:
+      - api
+
+volumes:
+  webapp-build:
