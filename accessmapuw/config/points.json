@@ -1,0 +1,15 @@
+{
+    "tilejson": "2.2.0",
+    "name": "AccessMap UW points",
+    "description": "POI layers for UW campus",
+    "version": "1.0.0",
+    "scheme": "xyz",
+    "tiles": [
+        "https://uw.accessmap.io/tiles/points/{z}/{x}/{y}.pbf",
+        "http://localhost:2015/tiles/points/{z}/{x}/{y}.pbf"
+    ],
+    "minzoom": "10",
+    "maxzoom": "17",
+    "center": "-122.312164,47.660763,17",
+    "bounds": "-122.318748,47.648961,-122.292565,47.664076",
+}
