@@ -42,14 +42,11 @@ docker-compose file needs to be edited).
 1. Edit environment variables in the `.env` file. If one doesn't exist, copy
 it from `.env_sample`: `cp .env_sample .env`:
 
-  - RAKAM_CONFIG_LOCK__KEY: set this to a secret string. This is a 'master'
+  - `RAKAM_CONFIG_LOCK__KEY`: set this to a secret string. This is a 'master'
   password for making new analytics projects, and its endpoint will be public.
-  - DATABASE_URL: this is the URL for the AccessMap routing database. This
-  will not be required eventually, but is for now. It should be a postgres
-  database URI.
-  - MAPBOX_TOKEN: A Mapbox token for your deployment, lets you use their
+  - `MAPBOX_TOKEN`: A Mapbox token for your deployment, lets you use their
   vector tiles for your map.
-  - OPENID_CLIENT_ID: The client ID value that is registered with OpenToAll accounts.
+  - `OPENID_CLIENT_ID`: The client ID value that is registered with OpenToAll accounts.
   This is only necessary if you want logins to work.
 
 If you are running this in production (you probably shouldn't, yet), make sure
@@ -58,11 +55,24 @@ to change the database username/password as well using the `RAKAMDB_USER` and
 have already created and persisted the database (you'll need to change this
 info manually in postgres or recreate the database entirely).
 
-2. Start the services: `docker-compose up`. Note: to run in production or staging mode,
+2. Add input data for the subproject. This is set up at the 'AMDATA' directory set by
+the .env file in the project's directory (this can be copied from .env.sample). The
+default directory (if none is set in .env) is `/docker/$PROJECT_data/`, e.g.
+`/docker/accessmap_data/`. Note that the data should correspond to the
+`config/layers.json` file in the subproject. For example, the `accessmap` project
+expects these files to exist:
+
+  - `sidewalks.geojson`
+
+  - `crossings.geojson`
+
+  - `elevator_paths.geojson`
+
+3. Start the services: `docker-compose up`. Note: to run in production or staging mode,
 add docker-compose config cascading, e.g.:
 `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
 
-3. Create a new analytics project. Rakam uses web requests for all setup, so
+4. Create a new analytics project. Rakam uses web requests for all setup, so
 you can use whatever tool you prefer. Also, note that the analytics server is
 proxied by the `accessmap-webapp` project, so these commands can be carried
 out remotely so long as you have access to it, at `<base_url>/analytics`. The
@@ -75,20 +85,20 @@ Note: if you're running the production configuration, use localhost:80 instead.
 The response will include a `master_key` and `write_key`. Write these down /
 save them in a secure location.
 
-4. Update the .env file and set these variables:
+5. Update the .env file and set these variables:
 
 - ANALYTICS_KEY: Set this to the `write_key` value you got in step 3.
 
-5. Stop the services: `docker-compose down` if you started them in daemon mode,
+6. Stop the services: `docker-compose down` if you started them in daemon mode,
 or `ctrl + C` and wait if started them interactively. Rakam/the database
 will complain about existing tables, which is fine.
 
-6. Start the services again: `docker-compose up`.
+7. Start the services again: `docker-compose up`.
 
 Note that the tiles won't appear until you see the message `pedestrian tiles
 built` pop up. It takes ~15-30 seconds for the vector tiles to build.
 
-7. Done! The entire system should now be working.
+8. Done! The entire system should now be working.
 
 ## Use during development
 

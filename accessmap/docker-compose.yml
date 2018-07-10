@@ -12,9 +12,9 @@ services:
     environment:
       - WAITFOR=rakamdb:5432
 
-  fetch_and_tippecanoe:
-    build: ./builds/tippecanoe-curl
-    entrypoint: sh /fetch_and_build_tiles.sh /home/tippecanoe/data
+  tippecanoe:
+    build: ./builds/tippecanoe
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data
     volumes:
       - ./scripts/fetch_and_build_tiles.sh:/fetch_and_build_tiles.sh
       - ${AM_DATADIR:-/docker/amdata}:/home/tippecanoe/data
@@ -22,8 +22,6 @@ services:
   api_build:
     build:
       context: https://github.com/accessmap/accessmap-api.git#develop
-    depends_on:
-      - fetch_and_tippecanoe
     command: python build.py
     volumes:
       - ${AM_DATADIR:-/docker/amdata}:/www/data

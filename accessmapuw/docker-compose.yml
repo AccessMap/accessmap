@@ -14,8 +14,6 @@ services:
   api_build:
     build:
       context: https://github.com/accessmap/accessmap-api.git#uw
-    depends_on:
-      - tippecanoe
     command: python build.py
     volumes:
       - ${AM_DATADIR:-/docker/amuwdata}:/www/data

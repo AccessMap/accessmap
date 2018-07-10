@@ -3,8 +3,6 @@ MAINTAINER Nick Bolten <nbolten@gmail.com>
 
 ARG TIPPECANOE_RELEASE="1.27.1"
 
-RUN apk add --no-cache curl
-
 RUN apk add --no-cache sudo git g++ make libgcc libstdc++ sqlite-libs sqlite-dev zlib-dev bash \
  && addgroup sudo && adduser -G sudo -D -H tippecanoe && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
  && cd /root \
