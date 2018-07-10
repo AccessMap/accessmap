@@ -2,23 +2,6 @@ version: '3.2'
 
 services:
 
-  rakamdb:
-    environment:
-      - POSTGRES_USER=rakam
-      - POSTGRES_PASSWORD=dummy
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    ports:
-      - 6666:5432
-    volumes:
-      - "${DB_VOLUME:-/docker/rakamdb}:/var/lib/postgresql/data/pgdata"
-
-  rakam:
-    environment:
-      - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://rakam:dummy@rakamdb:5432/rakam
-      - RAKAM_CONFIG_LOCK__KEY=mylockKey
-    ports:
-      - 9999:9999
-
   api:
     ports:
       - 5555:5555
@@ -30,3 +13,11 @@ services:
       - ./config/Caddyfile.dev:/etc/Caddyfile
     ports:
       - 2015:2015
+    entrypoint:
+      # A hack for the non-existence of docker.host.internal as of docker version 18:
+      # rakam is launched separately (as it can be used by multiple services and claims
+      # a single host dir), and in development is on the host, so we need
+      # docker.host.interal to exist
+      - /bin/sh
+      - -c
+      - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
