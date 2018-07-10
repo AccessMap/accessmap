@@ -20,6 +20,8 @@ services:
     restart: always
 
   api:
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
     restart: always
 
   webapp:
@@ -29,7 +31,7 @@ services:
 
   caddy:
     volumes:
-      - ./config/Caddyfile.prod:/etc/Caddyfile
+      - ./config/Caddyfile.staging:/etc/Caddyfile
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80

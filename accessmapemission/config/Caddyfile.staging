@@ -1,4 +1,4 @@
-0.0.0.0, localhost {
+staging.accessmap.io {
     root /webapp
 
     rewrite / {
@@ -7,7 +7,7 @@
       to {path} /
     }
 
-    proxy /analytics {$ANALYTICS_SERVER}:9999 {
+    proxy /analytics rakam:9999 {
         without /analytics
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
@@ -25,11 +25,9 @@
 
     log stdout
     errors stderr
-
-    tls off
 }
 
-0.0.0.0/tiles, localhost/tiles {
+staging.accessmap.io/tiles {
     root /amdata/tiles
 
     header / {

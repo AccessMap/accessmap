@@ -29,7 +29,7 @@ services:
 
   caddy:
     volumes:
-      - ./config/Caddyfile.staging:/etc/Caddyfile
+      - ./config/Caddyfile.prod:/etc/Caddyfile
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80
