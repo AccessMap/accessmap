@@ -7,7 +7,7 @@
       to {path} /
     }
 
-    proxy /analytics rakam:9999 {
+    proxy /analytics {$ANALYTICS_URL} {
         without /analytics
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}

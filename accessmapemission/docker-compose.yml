@@ -2,16 +2,6 @@ version: '3.2'
 
 services:
 
-  rakamdb:
-    image: postgres:9.6.1
-
-  rakam:
-    build: ./builds/rakam
-    depends_on:
-      - rakamdb
-    environment:
-      - WAITFOR=rakamdb:5432
-
   tippecanoe:
     build: ./builds/tippecanoe
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data
@@ -61,7 +51,6 @@ services:
       - ${DATADIR:-/docker/accessmapemission_data}:/amdata
     links:
       - api
-      - rakam
 
 volumes:
   webapp-build:
