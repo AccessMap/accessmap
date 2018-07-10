@@ -1,4 +1,4 @@
-emission.accessmap.io {
+0.0.0.0, localhost {
     root /webapp
 
     rewrite / {
@@ -7,7 +7,7 @@ emission.accessmap.io {
       to {path} /
     }
 
-    proxy /analytics {$ANALYTICS_SERVER}:9999 {
+    proxy /analytics rakam:9999 {
         without /analytics
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
@@ -25,9 +25,11 @@ emission.accessmap.io {
 
     log stdout
     errors stderr
+
+    tls off
 }
 
-emission.accessmap.io/tiles {
+0.0.0.0/tiles, localhost/tiles {
     root /amdata/tiles
 
     header / {

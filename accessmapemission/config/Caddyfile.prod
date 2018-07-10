@@ -1,4 +1,4 @@
-staging.accessmap.io {
+www.accessmap.io, accessmap.io {
     root /webapp
 
     rewrite / {
@@ -7,7 +7,7 @@ staging.accessmap.io {
       to {path} /
     }
 
-    proxy /analytics {$ANALYTICS_SERVER}:9999 {
+    proxy /analytics rakam:9999 {
         without /analytics
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
@@ -27,7 +27,7 @@ staging.accessmap.io {
     errors stderr
 }
 
-staging.accessmap.io/tiles {
+www.accessmap.io/tiles, accessmap.io/tiles {
     root /amdata/tiles
 
     header / {

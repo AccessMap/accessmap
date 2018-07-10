@@ -68,6 +68,9 @@ expects these files to exist:
 
   - `elevator_paths.geojson`
 
+Such data can be generated using the
+[accessmap-data](https://github.com/accessmap/accessmap-data) repository.
+
 3. Start the services: `docker-compose up`. Note: to run in production or staging mode,
 add docker-compose config cascading, e.g.:
 `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`

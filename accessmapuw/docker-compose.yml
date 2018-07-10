@@ -9,14 +9,14 @@ services:
       - ./scripts/build_tiles.sh:/build_tiles.sh
       - ./config/tilejson/paths.json:/home/tippecanoe/data/paths.json
       - ./config/tilejson/points.json:/home/tippecanoe/data/points.json
-      - ${AM_DATADIR:-/docker/amuwdata}:/home/tippecanoe/data
+      - ${DATADIR:-/docker/accessmapuw_data}:/home/tippecanoe/data
 
   api_build:
     build:
       context: https://github.com/accessmap/accessmap-api.git#uw
     command: python build.py
     volumes:
-      - ${AM_DATADIR:-/docker/amuwdata}:/www/data
+      - ${DATADIR:-/docker/accessmapuw_data}:/www/data
       - ./config/layers.json:/www/layers.json
 
   api:
@@ -26,12 +26,12 @@ services:
       - api_build
     command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
     volumes:
-      - ${AM_DATADIR:-/docker/amuwdata}:/www/data
+      - ${DATADIR:-/docker/accessmapuw_data}:/www/data
       - ./config/layers.json:/www/layers.json
 
   caddy:
     image: abiosoft/caddy:0.10.10
     volumes:
-      - ${AM_DATADIR:-/docker/amuwdata}:/amdata
+      - ${DATADIR:-/docker/accessmapuw_data}:/amdata
     links:
       - api
