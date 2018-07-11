@@ -3,7 +3,7 @@ set -e
 datadir=$1
 branch=master
 
-mkdir -p ${datadir}/tiles
+mkdir -p ${datadir}/tiles/tilejson
 
 # Build tiles
 tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
@@ -18,5 +18,5 @@ tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
     -L kerbs:${datadir}/kerbs.geojson \
     -e ${datadir}/tiles/points
 
-cp ${datadir}/paths.json ${datadir}/tiles/paths/tile.json
-cp ${datadir}/points.json ${datadir}/tiles/points/tile.json
+cp ${datadir}/paths.json ${datadir}/tiles/tilejson/paths.json
+cp ${datadir}/points.json ${datadir}/tiles/tilejson/points.json

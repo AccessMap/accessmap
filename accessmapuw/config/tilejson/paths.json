@@ -5,18 +5,17 @@
   "description": "",
   "filesize": 183337,
   "format": "pbf",
-  "id": "accessmap.aii7dtpk",
+  "id": "accessmapuw.paths",
   "mapbox_logo": true,
-  "maxzoom": 18,
+  "maxzoom": 17,
   "minzoom": 0,
   "modified": 1530442267511,
-  "name": "sidewalks-9sqt5n",
+  "name": "accessmapuw.paths",
   "private": false,
   "scheme": "xyz",
   "tilejson": "2.2.0",
   "tiles": [
-    "http://a.tiles.mapbox.com/v4/accessmap.aii7dtpk/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiYWNjZXNzbWFwIiwiYSI6ImNpajNjaDc1ZTAwNG11dWtuMjE5Z3Y4MDkifQ.xgPpYaQQqS9F4YFzJCp_ww",
-    "http://b.tiles.mapbox.com/v4/accessmap.aii7dtpk/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiYWNjZXNzbWFwIiwiYSI6ImNpajNjaDc1ZTAwNG11dWtuMjE5Z3Y4MDkifQ.xgPpYaQQqS9F4YFzJCp_ww"
+    "http://localhost:2015/tiles/paths/{z}/{x}/{y}.pbf"
   ],
   "vector_layers": [{
     "description": "",
@@ -25,11 +24,43 @@
       "length": "Number",
       "surface": "String"
     },
-    "id": "sidewalks-9sqt5n",
-    "maxzoom": 22,
-    "minzoom": 0,
-    "source": "accessmap.aii7dtpk",
-    "source_name": "sidewalks-9sqt5n"
+    "id": "sidewalks",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "sidewalks"
+  }, {
+    "description": "",
+    "fields": {
+      "incline": "Number",
+      "length": "Number",
+      "surface": "String"
+    },
+    "id": "footways",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "footways"
+  }, {
+    "description": "",
+    "fields": {
+      "crossign": "String",
+      "length": "Number",
+      "surface": "String"
+    },
+    "id": "crossings",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "crossings"
+  }, {
+    "description": "",
+    "fields": {},
+    "id": "stairs",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "stairs"
   }],
   "version": "1.0.0",
   "webpage":""
