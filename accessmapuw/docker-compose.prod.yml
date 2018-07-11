@@ -10,6 +10,11 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     restart: always
 
+  webapp:
+    restart: always
+    environment:
+      - OPENID_CLIENT_ID=AccessMapUW
+
   caddy:
     volumes:
       - ./config/Caddyfile.prod:/etc/Caddyfile
