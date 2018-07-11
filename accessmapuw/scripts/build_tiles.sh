@@ -1,7 +1,7 @@
 set -e
 
 datadir=$1
-branch=master
+host=$2
 
 mkdir -p ${datadir}/tiles/tilejson
 
@@ -20,3 +20,6 @@ tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
 
 cp ${datadir}/paths.json ${datadir}/tiles/tilejson/paths.json
 cp ${datadir}/points.json ${datadir}/tiles/tilejson/points.json
+
+sed -i s,HOSTNAME,${host},g ${datadir}/tiles/tilejson/paths.json
+sed -i s,HOSTNAME,${host},g ${datadir}/tiles/tilejson/points.json

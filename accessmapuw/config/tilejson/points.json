@@ -15,7 +15,7 @@
   "scheme": "xyz",
   "tilejson": "2.2.0",
   "tiles": [
-    "http://localhost:2015/tiles/points/{z}/{x}/{y}.pbf"
+    "HOSTNAME/tiles/points/{z}/{x}/{y}.pbf"
   ],
   "vector_layers": [{
     "description": "",

@@ -4,7 +4,6 @@ services:
 
   tippecanoe:
     build: ./builds/tippecanoe
-    entrypoint: sh /build_tiles.sh /home/tippecanoe/data
     volumes:
       - ./scripts/build_tiles.sh:/build_tiles.sh
       - ./config/tilejson/paths.json:/home/tippecanoe/data/paths.json
