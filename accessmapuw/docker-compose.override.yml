@@ -13,6 +13,8 @@ services:
       - ./config/Caddyfile.dev:/etc/Caddyfile
     ports:
       - 2015:2015
+    environment:
+      - ANALYTICS_URL=host.docker.internal:9999
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
       # rakam is launched separately (as it can be used by multiple services and claims

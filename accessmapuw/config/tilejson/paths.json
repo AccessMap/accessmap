@@ -1,14 +1,36 @@
 {
-    "tilejson": "2.2.0",
-    "name": "AccessMap UW paths",
-    "description": "Footpaths on UW campus",
-    "version": "1.0.0",
-    "scheme": "xyz",
-    "tiles": [
-        "https://uw.accessmap.io/tiles/paths/{z}/{x}/{y}.pbf",
-        "http://localhost:2015/tiles/paths/{z}/{x}/{y}.pbf"
-    ],
-    "minzoom": "10",
-    "maxzoom": "17",
-    "bounds": "-122.320741,47.643214,-122.290601,47.666229"
+  "bounds": [-122.3207405,47.6437514,-122.2984517,47.6649213],
+  "center": [-122.3095961,47.65433635,0],
+  "created": 1530442267792,
+  "description": "",
+  "filesize": 183337,
+  "format": "pbf",
+  "id": "accessmap.aii7dtpk",
+  "mapbox_logo": true,
+  "maxzoom": 18,
+  "minzoom": 0,
+  "modified": 1530442267511,
+  "name": "sidewalks-9sqt5n",
+  "private": false,
+  "scheme": "xyz",
+  "tilejson": "2.2.0",
+  "tiles": [
+    "http://a.tiles.mapbox.com/v4/accessmap.aii7dtpk/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiYWNjZXNzbWFwIiwiYSI6ImNpajNjaDc1ZTAwNG11dWtuMjE5Z3Y4MDkifQ.xgPpYaQQqS9F4YFzJCp_ww",
+    "http://b.tiles.mapbox.com/v4/accessmap.aii7dtpk/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiYWNjZXNzbWFwIiwiYSI6ImNpajNjaDc1ZTAwNG11dWtuMjE5Z3Y4MDkifQ.xgPpYaQQqS9F4YFzJCp_ww"
+  ],
+  "vector_layers": [{
+    "description": "",
+    "fields": {
+      "incline": "Number",
+      "length": "Number",
+      "surface": "String"
+    },
+    "id": "sidewalks-9sqt5n",
+    "maxzoom": 22,
+    "minzoom": 0,
+    "source": "accessmap.aii7dtpk",
+    "source_name": "sidewalks-9sqt5n"
+  }],
+  "version": "1.0.0",
+  "webpage":""
 }
