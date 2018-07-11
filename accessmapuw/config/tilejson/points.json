@@ -1,14 +1,44 @@
 {
-    "tilejson": "2.2.0",
-    "name": "AccessMap UW points",
-    "description": "POIS on UW campus",
-    "version": "1.0.0",
-    "scheme": "xyz",
-    "tiles": [
-        "https://uw.accessmap.io/tiles/points/{z}/{x}/{y}.pbf",
-        "http://localhost:2015/tiles/points/{z}/{x}/{y}.pbf"
-    ],
-    "minzoom": "10",
-    "maxzoom": "17",
-    "bounds": "-122.318748,47.648961,-122.292565,47.664076"
+  "bounds": [-122.3207405,47.6437514,-122.2984517,47.6649213],
+  "center": [-122.3095961,47.65433635,0],
+  "created": 1530442267792,
+  "description": "",
+  "filesize": 183337,
+  "format": "pbf",
+  "id": "accessmapuw.points",
+  "mapbox_logo": true,
+  "maxzoom": 17,
+  "minzoom": 0,
+  "modified": 1530442267511,
+  "name": "accessmapuw.points",
+  "private": false,
+  "scheme": "xyz",
+  "tilejson": "2.2.0",
+  "tiles": [
+    "http://localhost:2015/tiles/points/{z}/{x}/{y}.pbf"
+  ],
+  "vector_layers": [{
+    "description": "",
+    "fields": {
+      "kerb": "String",
+      "tactile_paving": "String"
+    },
+    "id": "kerbs",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.points",
+    "source_name": "kerbs"
+  }, {
+    "description": "",
+    "fields": {
+      "opening_hours": "String"
+    },
+    "id": "elevators",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.points",
+    "source_name": "elevators"
+  }],
+  "version": "1.0.0",
+  "webpage":""
 }
