@@ -33,6 +33,10 @@
     root /amdata/tiles
 
     header / {
+        Access-Control-Allow-Origin *
+    }
+
+    header (.pbf)$ {
         Content-Type application/vnd.mapbox-vector-tile
         Content-Encoding gzip
     }
