@@ -2,6 +2,9 @@ version: '3.2'
 
 services:
 
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data uw.accessmap.io
+
   api:
     environment:
       - DATABASE_URL=${DATABASE_URL}

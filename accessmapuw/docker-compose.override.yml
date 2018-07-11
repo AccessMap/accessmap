@@ -2,6 +2,9 @@ version: '3.2'
 
 services:
 
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data http://localhost:2015
+
   api:
     ports:
       - 5555:5555
