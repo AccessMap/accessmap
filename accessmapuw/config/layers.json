@@ -21,6 +21,22 @@
       "surface": { "type": "varchar" }
     }
   },
+  "pedestrian_road": {
+    "path": "pedestrian_roads.geojson",
+    "properties": {
+      "incline": { "type": "integer", "inverts": true },
+      "length": { "type": "real" },
+      "surface": { "type": "varchar" }
+    }
+  },
+  "footyes": {
+    "path": "footyes.geojson",
+    "properties": {
+      "incline": { "type": "integer", "inverts": true },
+      "length": { "type": "real" },
+      "surface": { "type": "varchar" }
+    }
+  },
   "stairs": {
     "path": "stairs.geojson",
     "properties": {}

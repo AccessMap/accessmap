@@ -10,6 +10,8 @@ tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
     -L sidewalks:${datadir}/sidewalks.geojson \
     -L crossings:${datadir}/crossings.geojson \
     -L footways:${datadir}/footways.geojson \
+    -L pedestrian_roads:${datadir}/pedestrian_roads.geojson \
+    -L footyes:${datadir}/footyes.geojson \
     -L stairs:${datadir}/stairs.geojson \
     -e ${datadir}/tiles/paths
 
