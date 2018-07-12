@@ -44,6 +44,30 @@
   }, {
     "description": "",
     "fields": {
+      "incline": "Number",
+      "length": "Number",
+      "surface": "String"
+    },
+    "id": "pedestrian_roads",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "pedestrian_roads"
+  }, {
+    "description": "",
+    "fields": {
+      "incline": "Number",
+      "length": "Number",
+      "surface": "String"
+    },
+    "id": "footyes",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapuw.paths",
+    "source_name": "footyes"
+  }, {
+    "description": "",
+    "fields": {
       "crossign": "String",
       "length": "Number",
       "surface": "String"
