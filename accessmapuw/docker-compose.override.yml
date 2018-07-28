@@ -12,12 +12,13 @@ services:
       - SERVER_PORT=5555
 
   caddy:
-    volumes:
-      - ./config/Caddyfile.dev:/etc/Caddyfile
     ports:
       - 2015:2015
     environment:
+      - HOST=${HOST:-localhost}
       - ANALYTICS_URL=host.docker.internal:9999
+    volumes:
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
       # rakam is launched separately (as it can be used by multiple services and claims
