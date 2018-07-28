@@ -1,4 +1,4 @@
-0.0.0.0, localhost {
+{$HOST} {
     root /webapp
 
     rewrite / {
@@ -26,15 +26,21 @@
     log stdout
     errors stderr
 
-    tls off
+    import Caddyfile.tls
 }
 
-0.0.0.0/tiles, localhost/tiles {
+{$HOST}/tiles {
     root /amdata/tiles
 
     header / {
+        Access-Control-Allow-Origin *
         Content-Type application/vnd.mapbox-vector-tile
         Content-Encoding gzip
+    }
+
+    header /tilejson {
+        Content-Type text/plain
+        -Content-Encoding
     }
 
     header /nocontent {

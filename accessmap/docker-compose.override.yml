@@ -2,6 +2,9 @@ version: '3.2'
 
 services:
 
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data http://${HOST}:2015
+
   api:
     ports:
       - 5555:5555
@@ -9,11 +12,10 @@ services:
       - SERVER_PORT=5555
 
   caddy:
-    volumes:
-      - ./config/Caddyfile.dev:/etc/Caddyfile
     ports:
       - 2015:2015
     environment:
+      - HOST=${HOST:-localhost}
       - ANALYTICS_URL=host.docker.internal:9999
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
@@ -23,3 +25,5 @@ services:
       - /bin/sh
       - -c
       - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
+    volumes:
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls

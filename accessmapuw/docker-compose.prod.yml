@@ -6,21 +6,20 @@ services:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data https://${HOST}
 
   api:
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
     restart: always
 
   webapp:
-    restart: always
     environment:
       - OPENID_CLIENT_ID=AccessMapUW
+    restart: always
 
   caddy:
-    volumes:
-      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
-      - /docker/.caddy:/root/.caddy
     ports:
       - 80:80
       - 443:443
     environment:
       - HOST=$HOST
+      - ANALYTICS_URL=$ANALYTICS_URL
+    volumes:
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
+      - /docker/.caddy:/root/.caddy

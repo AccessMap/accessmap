@@ -17,8 +17,6 @@ services:
     environment:
       - HOST=${HOST:-localhost}
       - ANALYTICS_URL=host.docker.internal:9999
-    volumes:
-      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
       # rakam is launched separately (as it can be used by multiple services and claims
@@ -27,3 +25,5 @@ services:
       - /bin/sh
       - -c
       - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
+    volumes:
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
