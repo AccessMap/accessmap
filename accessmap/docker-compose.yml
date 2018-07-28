@@ -7,6 +7,7 @@ services:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data
     volumes:
       - ./scripts/build_tiles.sh:/build_tiles.sh
+      - ./config/tilejson/pedestrian.json:/home/tippecanoe/data/pedestrian.json
       - ${DATADIR:-/docker/accessmap_data}:/home/tippecanoe/data
 
   api_build:
@@ -26,6 +27,7 @@ services:
     volumes:
       - ${DATADIR:-/docker/accessmap_data}:/www/data
       - ./config/layers.json:/www/layers.json
+      - ./config/costs_user.py:/www/cost_fun/costs_user.py
 
   webapp:
     build:
@@ -45,6 +47,7 @@ services:
   caddy:
     image: abiosoft/caddy:0.10.10
     volumes:
+      - ./config/Caddyfile:/etc/Caddyfile
       - type: volume
         source: webapp-build
         target: /webapp

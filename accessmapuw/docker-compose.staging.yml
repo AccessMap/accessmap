@@ -11,9 +11,9 @@ services:
     restart: always
 
   webapp:
-    restart: always
     environment:
       - OPENID_CLIENT_ID=AccessMapUW
+    restart: always
 
   caddy:
     volumes:
@@ -24,3 +24,4 @@ services:
       - 443:443
     environment:
       - HOST=$HOST
+      - ANALYTICS_URL=$ANALYTICS_URL
