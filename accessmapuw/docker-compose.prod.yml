@@ -3,7 +3,7 @@ version: '3.2'
 services:
 
   tippecanoe:
-    entrypoint: sh /build_tiles.sh /home/tippecanoe/data uw.accessmap.io
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data https://${HOST}
 
   api:
     environment:
