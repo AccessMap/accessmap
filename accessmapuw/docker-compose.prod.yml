@@ -17,8 +17,10 @@ services:
 
   caddy:
     volumes:
-      - ./config/Caddyfile.prod:/etc/Caddyfile
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80
       - 443:443
+    environment:
+      - HOST=$HOST
