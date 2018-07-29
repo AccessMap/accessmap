@@ -23,7 +23,7 @@ services:
       context: https://github.com/accessmap/accessmap-api.git#develop
     depends_on:
       - api_build
-    command: gunicorn -b 0.0.0.0:5555 --access-logfile=- accessmapapi.app:app
+    command: gunicorn -b 0.0.0.0:5656 --access-logfile=- accessmapapi.app:app
     volumes:
       - ${DATADIR:-/docker/accessmapuw_data}:/www/data
       - ./config/layers.json:/www/layers.json
