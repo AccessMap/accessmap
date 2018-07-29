@@ -7,9 +7,9 @@ services:
 
   api:
     ports:
-      - 5555:5555
+      - 5656:5656
     environment:
-      - SERVER_PORT=5555
+      - SERVER_PORT=5656
 
   caddy:
     ports:
