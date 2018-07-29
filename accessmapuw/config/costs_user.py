@@ -25,6 +25,15 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     return base * math.exp(-k * abs(grade - m))
 
 
+def tobler_piecewise(grade, k_up=3.5, k_down=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
+    if not grade:
+        return base
+    elif grade > INCLINE_IDEAL:
+        return tobler(grade, k=k_up, m=INCLINE_IDEAL, base=base)
+    else:
+        return tobler(grade, k=k_down, m=INCLINE_IDEAL, base=base)
+
+
 def cost_fun_generator(base_speed=WALK_BASE, incline_min=-0.1,
                        incline_max=0.085, avoid_curbs=False, avoid_stairs=False,
                        timestamp=None):
@@ -40,8 +49,8 @@ def cost_fun_generator(base_speed=WALK_BASE, incline_min=-0.1,
     :type avoid_curbs: bool
 
     '''
-    k_up = find_k(incline_max, INCLINE_IDEAL, DIVISOR)
-    k_down = find_k(incline_min, INCLINE_IDEAL, DIVISOR)
+    tobler_k_up = find_k(incline_max, INCLINE_IDEAL, DIVISOR)
+    tobler_k_down = find_k(incline_min, INCLINE_IDEAL, DIVISOR)
 
     if timestamp is None:
         date = datetime.now(pytz.timezone('US/Pacific'))
@@ -75,17 +84,9 @@ def cost_fun_generator(base_speed=WALK_BASE, incline_min=-0.1,
 
         way = d['way']
 
+        # Catch simple boolean flags
         if avoid_stairs and way == 'stairs':
             return None
-
-        # Initial speed based on incline
-        # NOTE: Inclines were initially multiplied by 1000 to save on filesize
-        if way in ['sidewalk', 'footway', 'pedestrian_road', 'footyes']:
-            incline = d['incline'] / 1000.
-        else:
-            # Assume all other paths are flat (due to lack of info)
-            # TODO: instead, just do a check on whether there is an incline key
-            incline = 0
 
         if 'opening_hours' in d:
             # There might be a time restriction
@@ -98,18 +99,31 @@ def cost_fun_generator(base_speed=WALK_BASE, incline_min=-0.1,
                 # Failed to parse or something: don't use this path
                 return None
 
-        if incline > incline_max:
-            return None
-        if incline < incline_min:
-            return None
+        # Calculate speed of movement
+        if way in ['sidewalk', 'footway', 'pedestrian_road', 'footyes']:
+            # Note: inclines are passed as integers to decrease transfer sizes - they
+            # should probably be converted during transit to the database to avoid
+            # redoing this calculation all the time (and improve understandability)
+            incline = d['incline'] / 1000.
 
-        # Speed based on incline
-        if not incline:
+            if d['length'] > 3:
+                if incline > incline_max:
+                    return None
+                if incline < incline_min:
+                    return None
+
+            # Use tobler to determine speed
+            speed = tobler_piecewise(incline, k_up=tobler_k_up, k_down=tobler_k_down,
+                                     m=INCLINE_IDEAL, base=base_speed)
+        elif way == 'elevator':
             speed = base_speed
-        elif incline > INCLINE_IDEAL:
-            speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
+        elif way == 'stairs':
+            # ~0.4 m/s from NIST dataset: http://dx.doi.org/10.6028/NIST.TN.1839
+            speed = 0.4
         else:
-            speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
+            # Unknown way type - outside defined cost function. This should
+            # potentially raise an exception
+            return None
 
         # Initial time estimate (in seconds) - based on speed
         time = d['length'] / speed

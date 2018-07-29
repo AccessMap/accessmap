@@ -94,10 +94,11 @@ def cost_fun_generator(base_speed=WALK_BASE, incline_min=-0.1,
                 # Failed to parse or something: don't use this path
                 return None
 
-        if incline > incline_max:
-            return None
-        if incline < incline_min:
-            return None
+        if d['length'] > 3:
+            if incline > incline_max:
+                return None
+            if incline < incline_min:
+                return None
 
         # Speed based on incline
         if not incline:
