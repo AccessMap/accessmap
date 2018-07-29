@@ -68,7 +68,7 @@
   }, {
     "description": "",
     "fields": {
-      "crossign": "String",
+      "crossing": "String",
       "length": "Number",
       "surface": "String"
     },

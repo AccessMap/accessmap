@@ -1,13 +1,63 @@
 {
-    "tilejson": "2.2.0",
-    "name": "AccessMap pedestrian paths",
-    "description": "Footpaths around the Seattle area",
-    "version": "1.0.0",
-    "scheme": "xyz",
-    "tiles": [
-        "HOSTNAME/tiles/pedestrian/{z}/{x}/{y}.pbf"
-    ],
-    "minzoom": "10",
-    "maxzoom": "17",
-    "bounds": "-122.4656,47.4863,-122.2305,47.7340"
+  "bounds": [-122.4656,47.4863,-122.2305,47.7340],
+  "center": [-122.3095961,47.65433635,0],
+  "created": 1530442267792,
+  "description": "Footpaths around the Seattle area",
+  "filesize": 183337,
+  "format": "pbf",
+  "id": "accessmapseattle.pedestrian",
+  "mapbox_logo": true,
+  "maxzoom": 17,
+  "minzoom": 0,
+  "modified": 1530442267511,
+  "name": "accessmapseattle.pedestrian",
+  "private": false,
+  "scheme": "xyz",
+  "tilejson": "2.2.0",
+  "tiles": [
+    "HOSTNAME/tiles/pedestrian/{z}/{x}/{y}.pbf"
+  ],
+  "vector_layers": [{
+    "description": "",
+    "fields": {
+      "incline": "Number",
+      "length": "Number",
+      "surface": "String",
+      "side": "String",
+      "street_name": "String",
+      "width": "Number"
+    },
+    "id": "sidewalks",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapseattle.pedestrian",
+    "source_name": "sidewalks"
+  }, {
+    "description": "",
+    "fields": {
+      "length": "Number",
+      "indoor": "Number",
+      "opening_hours": "String",
+      "via": "String"
+    },
+    "id": "elevator_paths",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapseattle.pedestrian",
+    "source_name": "elevator_paths"
+  }, {
+    "description": "",
+    "fields": {
+      "length": "Number",
+      "marked": "Number",
+      "curbramps": "Number"
+    },
+    "id": "crossings",
+    "maxzoom": 17,
+    "minzoom": 10,
+    "source": "accessmapseattle.pedestrian",
+    "source_name": "crossings"
+  }],
+  "version": "1.0.0",
+  "webpage": "www.accessmap.io"
 }
