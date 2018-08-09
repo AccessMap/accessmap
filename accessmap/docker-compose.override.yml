@@ -4,6 +4,8 @@ services:
 
   tippecanoe:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data http://$HOST:2015
+    environment:
+      - HOST=${HOST}
 
   api:
     ports:
@@ -15,7 +17,7 @@ services:
     ports:
       - 2015:2015
     environment:
-      - HOST=${HOST:-localhost}
+      - HOST=${HOST}
       - ANALYTICS_URL=host.docker.internal:9999
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
