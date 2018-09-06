@@ -12,9 +12,9 @@ services:
     environment:
       - OPENID_CLIENT_ID=AccessMap
       - HOST=$HOST
-    restart: always
 
   caddy:
+    restart: always
     volumes:
       - ./config/Caddyfile.tls.staging:/etc/Caddyfile.tls
       - /docker/.caddy:/root/.caddy
