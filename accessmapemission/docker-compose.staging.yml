@@ -8,11 +8,11 @@ services:
     restart: always
 
   webapp:
-    restart: always
     environment:
       - OPENID_CLIENT_ID=AccessMap
 
   caddy:
+    restart: always
     volumes:
       - ./config/Caddyfile.staging:/etc/Caddyfile
       - /docker/.caddy:/root/.caddy

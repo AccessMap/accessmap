@@ -11,9 +11,9 @@ services:
   webapp:
     environment:
       - OPENID_CLIENT_ID=AccessMapUW
-    restart: always
 
   caddy:
+    restart: always
     ports:
       - 80:80
       - 443:443
