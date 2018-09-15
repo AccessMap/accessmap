@@ -20,8 +20,6 @@ services:
   api:
     build:
       context: https://github.com/accessmap/accessmap-api.git#develop
-    depends_on:
-      - api_build
     command: gunicorn -b 0.0.0.0:5656 --access-logfile=- accessmapapi.app:app
     volumes:
       - ${DATADIR:-/docker/am_bellingham}:/www/data
@@ -30,7 +28,7 @@ services:
 
   webapp:
     build:
-      context: https://github.com/accessmap/accessmap-webapp.git#develop
+      context: https://github.com/accessmap/accessmap-webapp.git#city/bellingham
     command: yarn build
     volumes:
       - type: volume
