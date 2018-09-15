@@ -1,0 +1,26 @@
+version: '3.2'
+
+services:
+
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data https://${HOST}
+
+  api:
+    restart: always
+
+  webapp:
+    environment:
+      - OPENID_CLIENT_ID=AccessMap
+      - HOST=$HOST
+
+  caddy:
+    restart: always
+    volumes:
+      - ./config/Caddyfile.tls.staging:/etc/Caddyfile.tls
+      - /docker/.caddy:/root/.caddy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - ANALYTICS_URL=$ANALYTICS_URL
+      - HOST=$HOST
