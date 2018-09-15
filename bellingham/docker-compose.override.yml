@@ -1,0 +1,31 @@
+version: '3.2'
+
+services:
+
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data http://$HOST:2015
+    environment:
+      - HOST=${HOST}
+
+  api:
+    ports:
+      - 5656:5656
+    environment:
+      - SERVER_PORT=5656
+
+  caddy:
+    ports:
+      - 2015:2015
+    environment:
+      - HOST=${HOST}
+      - ANALYTICS_URL=host.docker.internal:9999
+    entrypoint:
+      # A hack for the non-existence of docker.host.internal as of docker version 18:
+      # rakam is launched separately (as it can be used by multiple services and claims
+      # a single host dir), and in development is on the host, so we need
+      # docker.host.interal to exist
+      - /bin/sh
+      - -c
+      - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
+    volumes:
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
