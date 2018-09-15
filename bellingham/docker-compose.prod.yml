@@ -20,6 +20,7 @@ services:
       - 443:443
     environment:
       - ANALYTICS_URL=$ANALYTICS_URL
+      - HOST=$HOST
     volumes:
       - ./config/Caddyfile.tls.prod:/etc/Caddyfile.tls
       - /docker/.caddy:/root/.caddy
