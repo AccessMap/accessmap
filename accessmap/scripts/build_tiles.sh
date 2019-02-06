@@ -7,9 +7,9 @@ mkdir -p ${datadir}/tiles/tilejson
 
 # Build tiles
 tippecanoe -f -B 17 -z 17 -Z 10 -r 0 \
-    -L sidewalks:${datadir}/sidewalks.geobuf \
-    -L crossings:${datadir}/crossings.geobuf \
-    -L elevator_paths:${datadir}/elevator_paths.geobuf \
+    -L sidewalks:${datadir}/sidewalks.geojson \
+    -L crossings:${datadir}/crossings.geojson \
+    -L elevator_paths:${datadir}/elevator_paths.geojson \
     -e ${datadir}/tiles/pedestrian
 
 cp ${datadir}/pedestrian.json ${datadir}/tiles/tilejson/pedestrian.json
