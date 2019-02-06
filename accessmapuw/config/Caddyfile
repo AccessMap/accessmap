@@ -14,7 +14,7 @@
         header_downstream X-Forwarded-Proto {scheme}
     }
 
-    proxy /api api:5555 {
+    proxy /api api:5656 {
         without /api
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
