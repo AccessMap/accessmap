@@ -1,5 +1,7 @@
 # AccessMap Orchestration
 
+![AccessMap orchestration diagram](orchestration-diagram.png)
+
 This repo contains orchestration info for AccessMap's deployments. At the
 moment, that entails docker-compose setups for different use cases, primarily
 focused on:
