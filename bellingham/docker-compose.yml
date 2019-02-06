@@ -11,7 +11,7 @@ services:
 
   api_build:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
+      context: https://github.com/accessmap/accessmap-api.git#city/bellingham
     command: python build.py
     volumes:
       - ${DATADIR:-/docker/am_bellingham}:/www/data
