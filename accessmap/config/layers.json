@@ -1,6 +1,6 @@
 {
   "crossing": {
-    "path": "crossings.geobuf",
+    "path": "crossings.geojson",
     "properties": {
       "curbramps": { "type": "integer" },
       "incline": { "type": "integer", "inverts": true },
@@ -10,7 +10,7 @@
     }
   },
   "sidewalk": {
-    "path": "sidewalks.geobuf",
+    "path": "sidewalks.geojson",
     "properties": {
       "incline": { "type": "integer", "inverts": true },
       "layer": { "type": "integer" },
@@ -20,7 +20,7 @@
     }
   },
   "elevator_path": {
-    "path": "elevator_paths.geobuf",
+    "path": "elevator_paths.geojson",
     "properties": {
       "indoor": { "type": "integer" },
       "length": { "type": "real" },
