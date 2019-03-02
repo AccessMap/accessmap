@@ -7,26 +7,31 @@ services:
     volumes:
       - ./scripts/build_tiles.sh:/build_tiles.sh
       - ./config/tilejson/pedestrian.json:/home/tippecanoe/data/pedestrian.json
-      - ${DATADIR:-/docker/accessmap_data}:/home/tippecanoe/data
+      - ./data/sidewalks.geojson:/home/tippecanoe/data/sidewalks.geojson:ro
+      - ./data/crossings.geojson:/home/tippecanoe/data/crossings.geojson:ro
+      - ./data/elevator_paths.geojson:/home/tippecanoe/data/elevator_paths.geojson:ro
+      - type: volume
+        source: tippecanoe
+        target: /home/tippecanoe/data
+        volume:
+          nocopy: true
 
-  api_build:
-    build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
-    command: python build.py
+
+  router_build:
+    build: ./builds/unweaver
+    command: poetry run unweaver build /data
     volumes:
-      - ${DATADIR:-/docker/accessmap_data}:/www/data
-      - ./config/layers.json:/www/layers.json
+      - ./config/unweaver:/data:rw
+      - ./data:/data/layers:ro
 
-  api:
-    build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
+  router:
+    build: ./builds/unweaver
     depends_on:
-      - api_build
-    command: gunicorn -b 0.0.0.0:5656 --access-logfile=- accessmapapi.app:app
+      - router_build
+    command: poetry run unweaver run /data -h 0.0.0.0 -p 5656
     volumes:
-      - ${DATADIR:-/docker/accessmap_data}:/www/data
-      - ./config/layers.json:/www/layers.json
-      - ./config/costs_user.py:/www/cost_fun/costs_user.py
+      - ./config/unweaver:/data:ro
+      - ./data:/data/layers:ro
 
   webapp:
     build:
@@ -50,9 +55,12 @@ services:
       - type: volume
         source: webapp-build
         target: /webapp
-      - ${DATADIR:-/docker/accessmap_data}:/amdata
+      - type: volume
+        source: tippecanoe
+        target: /tiles
     links:
-      - api
+      - router
 
 volumes:
   webapp-build:
+  tippecanoe:

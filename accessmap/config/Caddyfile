@@ -14,8 +14,8 @@
         header_downstream X-Forwarded-Proto {scheme}
     }
 
-    proxy /api api:5656 {
-        without /api
+    proxy /api/v1/directions router:5656 {
+        without /api/v1
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
         header_downstream X-Forwarded-Proto {scheme}
@@ -30,7 +30,7 @@
 }
 
 {$HOST}/tiles {
-    root /amdata/tiles
+    root /tiles/tiles
 
     header / {
         Access-Control-Allow-Origin *

@@ -12,7 +12,7 @@
   "sidewalk": {
     "path": "sidewalks.geojson",
     "properties": {
-      "incline": { "type": "integer", "inverts": true },
+      "incline": { "type": "real", "inverts": true },
       "layer": { "type": "integer" },
       "length": { "type": "real" },
       "side": { "type": "varchar" },

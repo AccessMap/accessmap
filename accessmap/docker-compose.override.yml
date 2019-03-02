@@ -7,7 +7,7 @@ services:
     environment:
       - HOST=${HOST}
 
-  api:
+  router:
     ports:
       - 5656:5656
     environment:
