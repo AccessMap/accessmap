@@ -5,7 +5,7 @@ services:
   tippecanoe:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data https://${HOST}
 
-  api:
+  router:
     restart: always
 
   webapp:

@@ -23,6 +23,13 @@ host network is not available without some hacky workarounds. Therefore, if
 an environment variable requires a database URI that refers to `localhost`, it
 will be looking at the docker container's network, not the host's network.
 
+### Getting data
+
+The data subdirectory in each project is the source of truth for several of AccessMap's
+functions: it's used to create the map tiles and the routing service. Place the
+require files for each project in that directory. For AccessMap, that's
+`sidewalks.geojson`, `crossings.geojson`, and `elevator_paths.geojson`.
+
 ### Running a deployment
 
 To run any given deployment, just run `docker-compose up` in its directory. To
@@ -88,8 +95,6 @@ docker-compose file needs to be edited).
 1. Edit environment variables in the `.env` file. If one doesn't exist, copy
 it from `.env_sample`: `cp .env_sample .env`:
 
-  - `DATADIR`: The host directory for storing persistent data (routing and tiles). This
-  defaults to `/docker/{subproject}_data` if not set, e.g. `/docker/accessmap_data`.
   - `MAPBOX_TOKEN`: A Mapbox token for your deployment, lets you use their
   vector tiles for your map.
   - `OPENID_CLIENT_ID`: The client ID value that is registered with OpenToAll accounts.
