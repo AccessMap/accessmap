@@ -7,6 +7,19 @@ services:
     environment:
       - HOST=${HOST}
 
+  api:
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_SECRET=unsafedevsecret
+      - JWT_SECRET=unsafejwtsecret
+      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap-api.db
+      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
+      - OSM_URI=https://master.apis.dev.openstreetmap.org/
+      - CONSUMER_CALLBACK_URI=http://localhost:2015/login_callback
+      - OSM_CLIENT_ID=$STAGING_OSM_CLIENT_ID
+      - OSM_CLIENT_SECRET=$STAGING_OSM_CLIENT_SECRET
+
   router:
     ports:
       - 5656:5656

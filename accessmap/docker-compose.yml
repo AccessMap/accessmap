@@ -16,6 +16,10 @@ services:
         volume:
           nocopy: true
 
+  api:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#develop
+    command: poetry run gunicorn --bind 0.0.0.0:5000 wsgi:app
 
   router_build:
     build: ./builds/unweaver
@@ -36,7 +40,7 @@ services:
   webapp:
     build:
       context: https://github.com/accessmap/accessmap-webapp.git#develop
-    command: yarn build
+    command: npm run build
     volumes:
       - type: volume
         source: webapp-build
@@ -46,7 +50,6 @@ services:
     environment:
       - MAPBOX_TOKEN=${MAPBOX_TOKEN}
       - ANALYTICS_KEY=${ANALYTICS_KEY}
-      - OPENID_CLIENT_ID=${OPENID_CLIENT_ID}
 
   caddy:
     image: abiosoft/caddy:0.10.10
@@ -60,6 +63,7 @@ services:
         target: /tiles
     links:
       - router
+      - api
 
 volumes:
   webapp-build:

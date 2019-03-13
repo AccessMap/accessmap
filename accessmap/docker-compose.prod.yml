@@ -5,12 +5,23 @@ services:
   tippecanoe:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/data https://${HOST}
 
+  # TODO: use gunicorn to serve API
+  api:
+    restart: always
+      - FLASK_SECRET=$FLASK_SECRET
+      - JWT_SECRET=$JWT_SECRET
+      - SQLALCHEMY_DATABASE_URI=$PRODUCTION_API_DATABASE_URI
+      - OAUTH_CACHE_DIR="/tmp/accessmap-api-cache"
+      - OSM_URI="https://api.openstreetmap.org/"
+      - CONSUMER_CALLBACK_URI=$HOST/login_callback
+      - OSM_CLIENT_ID=$OSM_CLIENT_ID
+      - OSM_CLIENT_SECRET=$OSM_CLIENT_SECRET
+
   router:
     restart: always
 
   webapp:
     environment:
-      - OPENID_CLIENT_ID=AccessMap
       - HOST=$HOST
 
   caddy:

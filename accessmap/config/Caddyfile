@@ -14,6 +14,14 @@
         header_downstream X-Forwarded-Proto {scheme}
     }
 
+    proxy /api api:5000 {
+        without /api
+        transparent
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
     proxy /api/v1/directions router:5656 {
         without /api/v1
         header_downstream Host {host}
