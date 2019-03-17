@@ -25,7 +25,7 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     return base * math.exp(-k * abs(grade - m))
 
 def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
-                       uphill=0.085):
+                       uphill=0.085, avoidCurbs=True):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -34,6 +34,8 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
     :type downhill: float
     :param uphill: Positive incline (uphill) maximum, as grade.
     :type uphill: float
+    :param avoidCurbs: Whether curb ramps should be avoided.
+    :type avoidCurbs: bool
 
     """
     k_down = find_k(-downhill, INCLINE_IDEAL, DIVISOR)
@@ -76,11 +78,18 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     else:
                         speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
                 else:
+                    if d["footway"] == "crossing":
+                        if avoidCurbs:
+                            if "curbramps" in d:
+                                # FIXME: 'curbramps' is being created as text in the db
+                                if d["curbramps"] == "0":
+                                    return None
+                            else:
+                                return None
+                        # Add delay for crossing street
+                        # TODO: tune this based on street type crossed and/or markings.
+                        time += 30
                     speed = base_speed
-
-                if d["footway"] == "crossing":
-                    # Add delay for crossing street
-                    time += 30
         else:
             # Unknown path type
             return None

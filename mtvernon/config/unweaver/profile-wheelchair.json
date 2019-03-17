@@ -2,6 +2,10 @@
   "name": "wheelchair",
   "args": [
     {
+      "name": "avoidCurbs",
+      "type": "fields.Boolean()"
+    },
+    {
       "name": "uphill",
       "type": "fields.Number(validate=validate.Range(0, 10))"
     },
