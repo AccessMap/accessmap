@@ -1,0 +1,23 @@
+version: '3.2'
+
+services:
+  api:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#develop
+    command: poetry run gunicorn --bind 0.0.0.0:5000 wsgi:app
+
+  router:
+    build: ./dockerfiles/unweaver
+    command: poetry run unweaver run /data -h 0.0.0.0 -p 5656
+    volumes:
+      - ./build/router:/data:ro
+
+  caddy:
+    image: abiosoft/caddy:0.10.10
+    volumes:
+      - ./config/caddy/Caddyfile:/etc/Caddyfile:ro
+      - ./build/tiles:/tiles:ro
+      - ./build/webapp:/webapp
+    links:
+      - router
+      - api

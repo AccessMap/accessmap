@@ -1,0 +1,15 @@
+{
+  "name": "wheelchair",
+  "args": [
+    {
+      "name": "uphill",
+      "type": "fields.Number(validate=validate.Range(0, 10))"
+    },
+    {
+      "name": "downhill",
+      "type": "fields.Number(validate=validate.Range(0, 15))"
+    }
+  ],
+  "cost_function": "cost-wheelchair.py",
+  "directions": "directions-wheelchair.py"
+}
