@@ -5,7 +5,10 @@ def directions(origin, destination, cost, nodes, edges):
     # Extract edge segments and total coordinates of path
     segments = {"type": "FeatureCollection", "features": []}
     coords = [edges[0]["_geometry"]["coordinates"][0]]
+    total_distance = 0
     for edge in edges:
+        if "length" in edge:
+            total_distance += edge["length"]
         feature = {
             "type": "Feature",
             "geometry": edge["_geometry"],
@@ -17,19 +20,14 @@ def directions(origin, destination, cost, nodes, edges):
         segments["features"].append(feature)
         coords += edge["_geometry"]["coordinates"][1:]
 
-    total_distance = 0
-
     # Extract steps information
     track = [
+        "crossing",
         "curbramps",
         "incline",
         "indoor",
         "length",
-        "marked",
-        "side",
-        "street_name",
         "surface",
-        "via"
     ]
 
     steps_data = path_to_directions(edges, track)
