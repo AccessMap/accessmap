@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: https://github.com/accessmap/accessmap-api.git#develop
-    command: poetry run gunicorn --bind 0.0.0.0:5000 wsgi:app
+    command: poetry run gunicorn --bind 0.0.0.0:5000 'wsgi:build_app(endpoint="/api/v1")'
 
   router:
     build: ./dockerfiles/unweaver
