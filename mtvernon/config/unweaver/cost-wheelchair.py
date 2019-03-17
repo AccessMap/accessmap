@@ -81,10 +81,11 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     if d["footway"] == "crossing":
                         if avoidCurbs:
                             if "curbramps" in d:
-                                # FIXME: 'curbramps' is being created as text in the db
-                                if d["curbramps"] == "0":
+                                if not d["curbramps"]:
                                     return None
                             else:
+                                # TODO: Make this user-configurable - we assume no
+                                # curb ramps by default now
                                 return None
                         # Add delay for crossing street
                         # TODO: tune this based on street type crossed and/or markings.

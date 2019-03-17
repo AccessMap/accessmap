@@ -14,8 +14,8 @@
         header_downstream X-Forwarded-Proto {scheme}
     }
 
-    proxy /api api:5000 {
-        without /api
+    proxy /api/v1 api:5000 {
+        without /api/v1
         transparent
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}
