@@ -1,0 +1,35 @@
+version: '3.2'
+
+services:
+  # Build routing graph
+  router_build:
+    build: ./dockerfiles/unweaver
+    command: bash -c "cp -r /inputconfig/* /data && cp -r /inputdata/layers /data/ && poetry run unweaver build /data --changes-sign incline"
+    volumes:
+      - ./config/unweaver:/inputconfig:rw
+      - ./data/transportation.geojson:/inputdata/layers/transportation.geojson:ro
+      - ./build/router:/data:rw
+
+  # Build tiles
+  tiles:
+    build: ./dockerfiles/tippecanoe
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output http://$HOST:2015
+    environment:
+        - HOST=${HOST}
+    volumes:
+      - ./config/tippecanoe/build_tiles.sh:/build_tiles.sh:ro
+      - ./config/tippecanoe/accessmap-tilejson.json:/home/tippecanoe/accessmap.json:ro
+      - ./data/transportation.geojson:/home/tippecanoe/input/transportation.geojson:ro
+      - ./data/barriers.geojson:/home/tippecanoe/input/barriers.geojson:ro
+      - ./build/tiles:/home/tippecanoe/output:rw
+
+  # Build webapp into static assets
+  webapp:
+    build:
+      context: https://github.com/accessmap/accessmap-webapp.git#develop
+    command: npm run build
+    volumes:
+      - ./build/webapp:/www/public
+    environment:
+      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
+      - ANALYTICS_KEY=${ANALYTICS_KEY}

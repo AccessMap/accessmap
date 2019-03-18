@@ -1,20 +1,13 @@
 version: '3.2'
 
 services:
-  api:
-    ports:
-      - 5000:5000
-    environment:
-      - FLASK_SECRET=unsafedevsecret
-      - JWT_SECRET=unsafejwtsecret
-      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap-api.db
-      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
-      - OSM_URI=https://master.apis.dev.openstreetmap.org/
-      - CONSUMER_CALLBACK_URI=http://localhost:2015/login_callback
-      - OSM_CLIENT_ID=$STAGING_OSM_CLIENT_ID
-      - OSM_CLIENT_SECRET=$STAGING_OSM_CLIENT_SECRET
 
-  router:
+  tippecanoe:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/data http://$HOST:2015
+    environment:
+      - HOST=${HOST}
+
+  api:
     ports:
       - 5656:5656
     environment:
@@ -35,4 +28,4 @@ services:
       - -c
       - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
     volumes:
-      - ./config/caddy/Caddyfile.tls.dev:/etc/Caddyfile.tls
+      - ./config/Caddyfile.tls.dev:/etc/Caddyfile.tls
