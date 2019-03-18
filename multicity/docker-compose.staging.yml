@@ -1,0 +1,28 @@
+version: '3.2'
+
+services:
+  api:
+    restart: always
+    environment:
+      - FLASK_SECRET=$STAGING_FLASK_SECRET
+      - JWT_SECRET=$STAGING_JWT_SECRET
+      - SQLALCHEMY_DATABASE_URI=$STAGING_API_DATABASE_URI
+      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
+      - OSM_URI=https://master.apis.dev.openstreetmap.org/
+      - CONSUMER_CALLBACK_URI=$STAGING_CONSUMER_CALLBACK_URI
+      - OSM_CLIENT_ID=$STAGING_OSM_CLIENT_ID
+      - OSM_CLIENT_SECRET=$STAGING_OSM_CLIENT_SECRET
+
+  router:
+    restart: always
+
+  caddy:
+    restart: always
+    volumes:
+      - ./config/Caddyfile.tls.staging:/etc/Caddyfile.tls
+      - /docker/.caddy:/root/.caddy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - ANALYTICS_URL=$ANALYTICS_URL
