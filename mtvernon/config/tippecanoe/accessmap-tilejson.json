@@ -1,6 +1,6 @@
 {
   "bounds": [-122.4062,48.3752,-122.1987,48.4503],
-  "center": [-122.336, 48.419],
+  "center": [-122.336, 48.419,14],
   "created": 1530442267792,
   "description": "Pedestrian transportation layer around Mt. Vernon",
   "filesize": 183337,
