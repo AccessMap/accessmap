@@ -1,0 +1,28 @@
+{
+  "description": "Areas served by AccessMap",
+  "filesize": 183337,
+  "format": "pbf",
+  "id": "areas_served",
+  "maxzoom": 14,
+  "minzoom": 0,
+  "name": "AccessMap Areas Served",
+  "private": false,
+  "scheme": "xyz",
+  "tilejson": "2.2.0",
+  "tiles": [
+    "HOSTNAME/tiles/areas_served/{z}/{x}/{y}.pbf"
+  ],
+  "vector_layers": [{
+    "description": "",
+    "fields": {
+      "name": "String"
+    },
+    "id": "areas",
+    "maxzoom": 14,
+    "minzoom": 0,
+    "source": "areas_served",
+    "source_name": "areas"
+  }],
+  "version": "1.0.0",
+  "webpage": "www.accessmap.io"
+}

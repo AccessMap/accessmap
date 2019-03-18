@@ -1,0 +1,57 @@
+{
+  "bounds": [-122.651,47.266,-121.955,48.828],
+  "center": [-122.339,47.604,15],
+  "created": 1530442267792,
+  "description": "Pedestrian network data",
+  "filesize": 183337,
+  "format": "pbf",
+  "id": "pedestrian",
+  "mapbox_logo": true,
+  "maxzoom": 14,
+  "minzoom": 0,
+  "modified": 1530442267511,
+  "name": "AccessMap Pedestrian Network",
+  "private": false,
+  "scheme": "xyz",
+  "tilejson": "2.2.0",
+  "tiles": [
+    "HOSTNAME/tiles/pedestrian/{z}/{x}/{y}.pbf"
+  ],
+  "vector_layers": [{
+    "description": "",
+    "fields": {
+      "brunnel": "String",
+      "crossing": "String",
+      "description": "String",
+      "elevator": "Number",
+      "foot": "Number",
+      "footway": "String",
+      "incline": "Number",
+      "indoor": "Number",
+      "layer": "Number",
+      "length": "Number",
+      "service": "String",
+      "subclass": "String",
+      "surface": "String"
+    },
+    "id": "transportation",
+    "maxzoom": 14,
+    "minzoom": 10,
+    "source": "pedestrian",
+    "source_name": "transportation"
+  }, {
+    "description": "",
+    "fields": {
+      "kerb": "String",
+      "tactile_paving": "Number"
+    },
+    "id": "barriers",
+    "maxzoom": 14,
+    "minzoom": 10,
+    "source": "pedestrian",
+    "source_name": "barriers"
+  }
+  ],
+  "version": "1.0.0",
+  "webpage": "www.accessmap.io"
+}
