@@ -4,11 +4,10 @@ services:
   api:
     restart: always
     environment:
-      - FLASK_SECRET=$PROD_FLASK_SECRET
-      - JWT_SECRET=$PROD_JWT_SECRET
+      - SECRET_KEY=$PROD_API_SECRET
+      - JWT_SECRET_KEY=$PROD_JWT_SECRET_KEY
       - SQLALCHEMY_DATABASE_URI=$PROD_API_DATABASE_URI
-      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
-      - OSM_URI=https://master.apis.dev.openstreetmap.org/
+      - OSM_URI=https://api.openstreetmap.org
       - CONSUMER_CALLBACK_URI=$PROD_CONSUMER_CALLBACK_URI
       - OSM_CLIENT_ID=$PROD_OSM_CLIENT_ID
       - OSM_CLIENT_SECRET=$PROD_OSM_CLIENT_SECRET
@@ -25,4 +24,5 @@ services:
       - 80:80
       - 443:443
     environment:
-      - ANALYTICS_URL=$ANALYTICS_URL
+      - ANALYTICS_URL=$PROD_ANALYTICS_URL
+      - HOST=${PROD_HOST}
