@@ -13,9 +13,7 @@ services:
   # Build tiles
   tiles:
     build: ./dockerfiles/tippecanoe
-    entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output http://$HOST:2015
-    environment:
-        - HOST=${HOST}
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output http://$DEV_HOST:2015
     volumes:
       - ./config/tippecanoe/build_tiles.sh:/build_tiles.sh:ro
       - ./config/tippecanoe/pedestrian-tilejson.json:/home/tippecanoe/pedestrian.json:ro
@@ -33,5 +31,6 @@ services:
       - ./data/regions.geojson:/www/public/regions.json:ro
       - ./build/webapp:/www/public
     environment:
-      - MAPBOX_TOKEN=${MAPBOX_TOKEN}
-      - ANALYTICS_KEY=${ANALYTICS_KEY}
+      - MAPBOX_TOKEN=${DEV_MAPBOX_TOKEN}
+      - ANALYTICS=yes
+      - ANALYTICS_KEY=${DEV_ANALYTICS_KEY}

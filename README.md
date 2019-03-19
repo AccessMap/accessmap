@@ -2,145 +2,250 @@
 
 ![AccessMap orchestration diagram](orchestration-diagram.png)
 
-This repo contains orchestration info for AccessMap's deployments. At the
-moment, that entails docker-compose setups for different use cases, primarily
-focused on:
-  - The production deployment on accessmap.io
-  - Testing / research deployments for students / researchers
-  - Development environments
+This repo contains the `docker-compose` orchestration scripts and setup for AccessMap.
 
-## The deployments
+It is set up to support a dev-staging-production workflow, whereby local testing can
+be done in `development` mode with debug messages and (potentially) less secure
+methods, while `staging` and `production` (`prod`) modes are optimized for speed, do
+not show debug methods, and use best practices security.
 
-### Configuration
+## Configuration
 
-Each directory is a self-contained docker-compose setup. Configuration is
-controlled by using either a .env file or exporting the necessary environment
-variables globally or in the scope of the docker-compose command. An example
-.env file is available for each directory as .env.example.
-
-Please note that because all of the services run in a docker container, the
-host network is not available without some hacky workarounds. Therefore, if
-an environment variable requires a database URI that refers to `localhost`, it
-will be looking at the docker container's network, not the host's network.
+AccessMap requires two types of configuration: (1) Data for routing, generating tiles,
+and defining regions served by the application (e.g. multiple cities), and (2)
+environment variables dictating how the deployments run.
 
 ### Getting data
 
-The data subdirectory in each project is the source of truth for several of AccessMap's
-functions: it's used to create the map tiles and the routing service. Place the
-require files for each project in that directory. For AccessMap, that's
-`sidewalks.geojson`, `crossings.geojson`, and `elevator_paths.geojson`.
+For a deployment to work, you need to places two files in the `data/` directory:
+`transportation.geojson` and `regions.geojson`.
 
-### Running a deployment
+#### Aside: where do I get these files?
 
-To run any given deployment, just run `docker-compose up` in its directory. To
-launch as a background daemon, run `docker-compose -d up`.
+For now, the best way to get AccessMap data is to run our reproducible ETL pipelines
+in the `accessmap-data` repository: https://github.com/accessmap/accessmap-data. Note
+that you may want to use the `develop` branch to get the latest build process. Using
+the `accessmap-data` repository, you can run `snakemake -j 8` in each `cities`
+subdirectory and then `python ./merge.py` to get all the data you need for this
+deployment: `transportation.geojson` and `regions.geojson`.
 
-The docker-compose files are all version `3`, so make sure you have a recent
-version of `docker-compose` (they were initially developed with v1.15).
+#### `transportation.geojson`
 
-Running the containers should require only `docker` and `docker-compose`.
-Doing some of the follow-up setup may require `curl`.
+This GeoJSON file describes the pedestrian network for a given region and contains
+features like sidewalks, crosswalks, and curb data. It follows the OpenMapTiles tile
+`transportation` layer schema, with a few extensions (read the `accessmap-data` README
+for more information). This will be used as the data for routing in the `unweaver`
+routing engine that powers AccessMap and will become the `transportation` layer in
+the `pedestrian` tileset served by AccessMap.
 
-### Setup
+#### `regions.geojson`
 
-#### Rakam analytics
+This GeoJSON file describes the regions served by this instance of AccessMap and is
+auto-generated as part of the `accessmap-data` ETL pipeline. Each feature has a
+geometry (the convex hull) of the region served and has metadata used to define front
+end interactions, such as where to center the map, the name and unique key of the
+region, and its `[W,S,E,N]` bounding box. This data is embedded in the front end via
+the `webapp` service.
 
-This step is optional - everything will run fine without the analytics server, except
-user interactions won't be tracked (of course).
 
-Rakam has been isolated into its own deployment, found in the `rakam` directory. In
-development mode (default), it persists data in /docker/rakamdb, a postgres database.
-This poses a challenge for other services that use it - they need access to the host
-network. This is handled somewhat automatically in development mode, but should be
-kept in mind if networking issues arise. In staging and production environments, rakam
-should have its own stable URL and use a properly managed database (not using a docker
-DB).
+### Environment variables
 
-Do the following steps in the `rakam` directory:
+AccessMap uses environment variables to configure its deployments to maximize
+portability and follow best practices. These environment variables can be set at
+runtime (using `source` or explicit `export` commands, for example) or configured using
+a .env file, of which an example is provided at .env.sample.
 
-1. (production mode only) Set up the following environment variables in the `.env`
-file:
-  - `RAKAM_CONFIG_LOCK__KEY`: set this to a secret string. This is a 'master'
-  password for making new analytics projects, and its endpoint will be public. In
-  development mode, this would be set to a hard-coded, publicly visible (in this repo)
-  string, so make sure to set this variable properly in production!
-  - `RAKAM_PROD_DB_URL`: A postgres database URI for connecting to the database
-  backing rakam in production mode. All of the settings can be created arbitrarily,
-  but the default string in development mode is
-  `postgres://rakam:dummy@rakamdb:5432/rakam`.
-  - `RAKAM_STAGING_DB_URL`: when running in staging mode (docker-compose.staging.yaml),
-  use this instead of `RAKAM_PROD_DB_URL`.
+Environment variables that need to be configured and distinct for different deployments
+(dev, staging, production) are prepended with an environment string. For example, to
+pass the `OSM_CLIENT_ID` setting to a dev environment, set `DEV_OSM_CLIENT_ID`. By
+explicitly separating these deployment configurations, you can ensure your secrets will
+never leak in an inappropriate environment. The following examples do not have the
+prepended environment string, for simplicity:
 
-2. Start the services
+`HOST`: The hostname of the deployment. For development, this is usually localhost,
+though it might sometimes be 0.0.0.0 for tricky dev deployments (e.g., native
+application clients). In staging/production modes, this should usually be a registered
+domain name URI, potentially with a subdomain, e.g. `stage.yourwebsite.com` or
+`yourwebsite.com`. In development mode, this host will be automatically prepended with
+`http://`, while staging and production modes will have `https://`.
 
-`docker-compose up`
+`MAPBOX_TOKEN`: An API access token from `mapbox.com`, used to geocode and get basemap
+tiles.
 
-3. Access rakam at `{host}:9999`
+`ANALYTICS_URL`: This does not need to be set in `development` mode, as it is
+assumed to be a local deployment from the `rakam` directory. In staging or production,
+this should be the base URL for the analytics endpoint and it should be secure to
+prevent MITM attacks: either a local URL at an endpoint not exposed to the internet
+(like a closed port) or over HTTPS. If you set `ANALYTICS=no` in any environment, this
+does not need to be set (note: this is currently hard-coded in the docker-compose
+files).
 
-4. Create a project. The example below is for a development version (hence port 2015).
+`ANALYTICS_KEY`: The write key for your `rakam` project. See the Analytics section for
+more information.
 
-    curl --request POST --url http://localhost:2015/analytics/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
+`OSM_CLIENT_ID`: Your OAuth 1.0a registered application client ID from
+openstreetmap.org. This is used for logins. Keep in mind that development mode uses
+the testing API on openstreetmap.org rather than the main one, so you will need to
+register an application at https://master.apis.dev.openstreetmap.org/ for development
+and https://api.openstreetmap.org for production.
+
+`OSM_CLIENT_SECRET`: Your OAuth 1.0a registered application client secret from
+openstreetmap.org.
+
+`API_SECRET`: The secret to be passed to the API for securing sessions. This should
+be a properly secure hash based on something like `ssh-keygen` and should be a
+closely-guarded secret in both staging and production modes. It should also be unique
+between every mode.
+
+`JWT_SECRET_KEY`: A secret used to sign JWTs, this must also be a secure and unique
+secret generated by something like `ssh-keygen`. JWTs are exposed to clients and a
+poorly-chosen secret could compromise your users' credentials and personal information.
+
+`STAGING_OSM_URI`: This is only used for the staging environment, which may need to
+test features in both the OpenStreetMap sandbox and then on the primary OSM deployment.
+It is the base URL for the OpenStreetMap API to use.
+
+## Running a deployment
+
+`docker-compose` has an awkward system for managing different deployment environments
+that depends on explicitly cascading different configuration files whenever you run
+a `docker-compose` command. AccessMap uses a bunch of docker-compose files to make this
+workflow possible.
+
+`docker-compose` also does not have a good way to separate out long-running services
+from those that only need to be run once or very infrequently, so we use separate
+configuration files for the `build` steps (compiling the web app, creating the routing
+graph, creating vector tiles) from the `run` steps (running the reverse proxy, the
+routing engine, the API).
+
+### Building assets
+
+AccessMap builds data resources as part of its deployment: it compiles the web app
+into a minified set of static assets, creates a graph file for routing, and generates
+vector tiles. Because these steps do not need to be run during every redeployment, they
+are controlled by a separate set of docker-compose files: `docker-compose.build.yml`,
+`docker-compose.staging.yml`, and `docker-compose.prod.yml`. To deploy different
+environments, cascade the configs. Examples:
+
+In development mode:
+
+    `docker-compose -f docker-compose.build.yml up`
+
+In staging mode:
+
+    `docker-compose -f docker-compose.build.yml -f docker-compose.build.staging.yml up`
+
+In production mode:
+
+    `docker-compose -f docker-compose.build.yml -f docker-compose.build.prod.yml up`
+
+*Note: the build steps will fail if you haven't added your files to the `data/`
+directory*
+
+### Database migrations
+
+The user api (`api`) service is stateful and depends on precise table definitions in
+its database that may change over the lifetime of the project. Setting up the database
+can therefore sometimes have two steps: database initialization and database
+migrations. Because running migrations on staging/production databases should be
+carefully curated, database migration is not automatically built into the main
+build/run workflow.
+
+#### Database initialization
+
+During the first time that you create a deployment, you will need to run the migration
+scripts to create the database. You can do this via docker-compose:
+
+    docker-compose run api poetry run flask db upgrade
+
+For other environments, make sure to add `-f docker-compose.{environment}.yml` after
+the `docker-compose` command.
+
+#### Running a migration
+
+If you want to update your database to match the latest in AccessMap, you'll need to
+run the same command as above:
+
+    docker-compose run api poetry run flask db upgrade
+
+Be careful about doing such migrations on a production service - you may often need to
+use intermediate database schemas to transition from an old schema to a new schema,
+where data is copied to multiple tables until all clients have transitioned to the new
+schema.
+
+### Long-running services
+
+AccessMap deploys a few long-running services: a reverse proxy that handles HTTPS
+security and routes (caddy), an instance of the routing engine, and an instance of the
+user API. These are also created by cascading configs:
+
+In development mode:
+
+    `docker-compose -f docker-compose.yml up`
+
+In staging mode:
+
+    `docker-compose -f docker-compose.yml -f docker-compose.staging.yml up`
+
+In production mode:
+
+    `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
+
+## Analytics
+
+AccessMap tracks user interactions to do research on user interactions and root out
+bugs. Analytics is not required to deploy AccessMap and can be disabled using
+`ANALYTICS=no` environment variable (this currently requries you to edit the
+`docker-compose.yml` build files)
+
+### Running rakam
+
+AccessMap uses a self-hosted deployment of `rakam` for its analytics. We chose `rakam`
+because it could be self-hosted (no data shared with third parties) and has a very
+flexible data storage model that works well for doing studies.
+
+You do not need to run your own deployment of `rakam` to enable analytics - you can
+just as easily use the paid rakam service. However, if you want to self-deploy, the
+`rakam` directory contains the `docker-compose` configs you need to get up and running.
+
+In development mode, `rakam` requires no configuration, just run:
+
+    docker-compose up -d
+
+In staging and production modes, you should be using a secure production database to
+run `rakam`, so set these environment variables (prepend `STAGING_` or `PROD_`):
+
+- `RAKAM_CONFIG_LOCK_KEY`: This is a secret used for generating new projects and should
+be treated as root access to the analytics server and database. Make it secret!
+
+- `RAKAM_DB_URL`: The JDBC-compatible database URL. Using SSL is strongly recommended.
+AccessMap uses the postgres driver.
+
+
+### Getting a key
+
+`rakam` operates on the basis of "projects", which are isolated namespaces in the
+analytics database. It is a good idea to create a new project for every new study you
+do, e.g. for A/B testing.
+
+`rakam` uses a web API to manage the creation of projects. To create a new one, you
+need to have the `RAKAM_CONFIG_LOCK_KEY` credential mentioned above and create a
+request to the endpoint. An example in development mode:
+
+    curl --request POST --url http://localhost:9999/analytics/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
+
+Save the response data! At a minimum, you will need to save the write key for use by
+AccessMap. If necessary, you can retrieve these data at a later time directly in the
+database in the `api_key` table.
+
+In the POSTed data, `"name"` is the unique namespace for your new project and
+`"lock_key"` is the secret key (essentially a password) you've defined in your config.
+Make sure to run `rakam` in staging or development mode if it is internet-facing.
+
+When AccessMap is also deployed, it proxies requests to `/analytics` to this `rakam`
+instance (if correctly configured), so you can also create new projects at the
+`http(s)://$hostname/analytics/project/create` endpoint.
 
 Save these credentials! The `write_key` is needed for any project that wants to send
 analytics to this rakam project. If you lose these credentials for any reason, they
 can be accessed at the database backing `rakam` in the `api_key` table.
-
-#### accessmap, accessmapuw, accessmapemission
-
-Setting up this deployment is a two-step process, as the analytics
-server requires a bit of setup and creating some credentials, and then the
-webapp needs to know those credentials and get restarted (i.e. the
-docker-compose file needs to be edited).
-
-1. Edit environment variables in the `.env` file. If one doesn't exist, copy
-it from `.env_sample`: `cp .env_sample .env`:
-
-  - `MAPBOX_TOKEN`: A Mapbox token for your deployment, lets you use their
-  vector tiles for your map.
-  - `OPENID_CLIENT_ID`: The client ID value that is registered with OpenToAll accounts.
-  This is only necessary if you want logins to work.
-
-2. (optional) Add analytics environment variables to the `.env` file. In dev mode,
-these do not need to be configured - just set up and run `rakam` in the previous
-section. The staging/production environment variables;
-
-   - `ANALYTICS_SERVER`: the full URL to the analytics server, including the port if
-   it hasn't been proxied to a path on port :80. Examples: mycoolwebsite.com:9999 or
-   192.168.0.34:9999 (static local network IP of your computer).
-   - `ANALYTICS_KEY`: a write key for a project on the `rakam` instance. It's best to
-   create a new analytics project for at least every major release, and ideally on a
-   per-study basis.
-
-3. Put the required input data in the `DATADIR` folder if you set that variable in
-`.env`, `/docker/{subproject}_data` if you didn't. Example: `/docker/accessmap-data`.
-
-Note that the data should correspond to the `config/layers.json` file in the
-subproject as well as the tippecanoe build script in `scripts/build_tiles.sh`. For
-example, the `accessmap` project expects these files to exist:
-
-  - `sidewalks.geobuf`
-
-  - `crossings.geobuf`
-
-  - `elevator_paths.geobuf`
-
-The data used in all of these projects can be generated using the
-[accessmap-data](https://github.com/accessmap/accessmap-data) repository.
-
-4. Start the services: `docker-compose up -d`.
-
-To run in production or staging mode, cascade the configs:
-`docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
-
-Some of the services may take a while to load, depending on the size of the dataset.
-You can track their current status using `docker logs`, e.g. to check the tile-building
-container:
-
-    docker logs -f tippecanoe
-
-5. Test the servies
-
-For projects running in development mode, the website will be available at
-`localhost:2015` (and available externally at `{your_ip}:2015`. Note that accessmapuw
-does not currently have a website, and will only provide tiles and the routing
-service, as it's focused on native mobile apps.

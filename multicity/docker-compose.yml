@@ -14,8 +14,6 @@ services:
 
   caddy:
     image: abiosoft/caddy:0.10.10
-    environment:
-      - HOST=${HOST}
     volumes:
       - ./config/caddy/Caddyfile:/etc/Caddyfile:ro
       - ./build/tiles:/tiles:ro

@@ -5,14 +5,14 @@ services:
     ports:
       - 5000:5000
     environment:
-      - FLASK_SECRET=unsafedevsecret
-      - JWT_SECRET=unsafejwtsecret
-      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap-api.db
-      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
-      - OSM_URI=https://master.apis.dev.openstreetmap.org/
+      - SECRET_KEY=unsafedevsecret
+      - JWT_SECRET_KEY=unsafejwtsecret
       - CONSUMER_CALLBACK_URI=http://localhost:2015/login_callback
-      - OSM_CLIENT_ID=$STAGING_OSM_CLIENT_ID
-      - OSM_CLIENT_SECRET=$STAGING_OSM_CLIENT_SECRET
+      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap/accessmap-api.db
+      - OSM_CLIENT_ID=$DEV_OSM_CLIENT_ID
+      - OSM_CLIENT_SECRET=$DEV_OSM_CLIENT_SECRET
+    volumes:
+      - /tmp/accessmap:/tmp/accessmap
 
   router:
     ports:
@@ -25,6 +25,7 @@ services:
       - 2015:2015
     environment:
       - ANALYTICS_URL=host.docker.internal:9999
+      - HOST=${DEV_HOST}
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
       # rakam is launched separately (as it can be used by multiple services and claims

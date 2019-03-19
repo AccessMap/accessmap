@@ -4,11 +4,10 @@ services:
   api:
     restart: always
     environment:
-      - FLASK_SECRET=$STAGING_FLASK_SECRET
-      - JWT_SECRET=$STAGING_JWT_SECRET
+      - SECRET_KEY=$STAGING_API_SECRET
+      - JWT_SECRET_KEY=$STAGING_JWT_SECRET_KEY
       - SQLALCHEMY_DATABASE_URI=$STAGING_API_DATABASE_URI
-      - OAUTH_CACHE_DIR=/tmp/accessmap-api-cache
-      - OSM_URI=https://master.apis.dev.openstreetmap.org/
+      - OSM_URI=$STAGING_OSM_URI
       - CONSUMER_CALLBACK_URI=$STAGING_CONSUMER_CALLBACK_URI
       - OSM_CLIENT_ID=$STAGING_OSM_CLIENT_ID
       - OSM_CLIENT_SECRET=$STAGING_OSM_CLIENT_SECRET
@@ -25,4 +24,5 @@ services:
       - 80:80
       - 443:443
     environment:
-      - ANALYTICS_URL=$ANALYTICS_URL
+      - ANALYTICS_URL=$STAGING_ANALYTICS_URL
+      - HOST=${STAGING_HOST}
