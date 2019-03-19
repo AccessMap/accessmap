@@ -1,27 +1,27 @@
 {
-  "description": "Areas served by AccessMap",
+  "description": "Regions served by AccessMap",
   "filesize": 183337,
   "format": "pbf",
-  "id": "areas_served",
+  "id": "regions",
   "maxzoom": 14,
   "minzoom": 0,
-  "name": "AccessMap Areas Served",
+  "name": "AccessMap Regions",
   "private": false,
   "scheme": "xyz",
   "tilejson": "2.2.0",
   "tiles": [
-    "HOSTNAME/tiles/areas_served/{z}/{x}/{y}.pbf"
+    "HOSTNAME/tiles/regions/{z}/{x}/{y}.pbf"
   ],
   "vector_layers": [{
     "description": "",
     "fields": {
       "name": "String"
     },
-    "id": "areas",
+    "id": "region",
     "maxzoom": 14,
     "minzoom": 0,
-    "source": "areas_served",
-    "source_name": "areas"
+    "source": "regions",
+    "source_name": "AccessMap Regions"
   }],
   "version": "1.0.0",
   "webpage": "www.accessmap.io"

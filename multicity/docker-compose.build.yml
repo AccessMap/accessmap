@@ -19,9 +19,9 @@ services:
     volumes:
       - ./config/tippecanoe/build_tiles.sh:/build_tiles.sh:ro
       - ./config/tippecanoe/pedestrian-tilejson.json:/home/tippecanoe/pedestrian.json:ro
-      - ./config/tippecanoe/areas_served-tilejson.json:/home/tippecanoe/areas_served.json:ro
+      - ./config/tippecanoe/regions-tilejson.json:/home/tippecanoe/regions.json:ro
       - ./data/transportation.geojson:/home/tippecanoe/input/transportation.geojson:ro
-      - ./data/areas_served.geojson:/home/tippecanoe/input/areas_served.geojson:ro
+      - ./data/regions.geojson:/home/tippecanoe/input/regions.geojson:ro
       - ./build/tiles:/home/tippecanoe/output:rw
 
   # Build webapp into static assets
@@ -30,6 +30,7 @@ services:
       context: https://github.com/accessmap/accessmap-webapp.git#develop
     command: npm run build
     volumes:
+      - ./data/regions.geojson:/www/public/regions.json
       - ./build/webapp:/www/public
     environment:
       - MAPBOX_TOKEN=${MAPBOX_TOKEN}

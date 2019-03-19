@@ -16,10 +16,10 @@ tippecanoe -f -Z 6 -z 14 -B 14 -r 2.5 \
 cp /home/tippecanoe/pedestrian.json ${outputdir}/tilejson/pedestrian.json
 sed -i s,HOSTNAME,${host},g ${outputdir}/tilejson/pedestrian.json
 
-# Build areas_served layer
+# Build regions layer
 tippecanoe -f -Z 0 -z 14 -B 14 -r 2.5 \
-    -L areas:${inputdir}/areas_served.geojson \
-    -e ${outputdir}/areas_served
+    -L region:${inputdir}/regions.geojson \
+    -e ${outputdir}/regions
 
-cp /home/tippecanoe/areas_served.json ${outputdir}/tilejson/areas_served.json
-sed -i s,HOSTNAME,${host},g ${outputdir}/tilejson/areas_served.json
+cp /home/tippecanoe/regions.json ${outputdir}/tilejson/regions.json
+sed -i s,HOSTNAME,${host},g ${outputdir}/tilejson/regions.json
