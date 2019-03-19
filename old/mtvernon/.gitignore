@@ -1,7 +1,0 @@
-.env
-*.pyc
-__pyenv__
-data/*
-!data/.gitkeep
-build/*
-!build/.gitkeep
