@@ -32,5 +32,5 @@ services:
       - ./build/webapp:/www/public
     environment:
       - MAPBOX_TOKEN=${DEV_MAPBOX_TOKEN}
-      - ANALYTICS=yes
+      - ANALYTICS=${DEV_ANALYTICS:-no}
       - ANALYTICS_KEY=${DEV_ANALYTICS_KEY}
