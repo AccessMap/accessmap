@@ -254,3 +254,31 @@ instance (if correctly configured), so you can also create new projects at the
 Save these credentials! The `write_key` is needed for any project that wants to send
 analytics to this rakam project. If you lose these credentials for any reason, they
 can be accessed at the database backing `rakam` in the `api_key` table.
+
+## Logs
+
+Logging solutions are many, varied, annoying, particularly with docker-based workflows.
+We just deploy on Ubuntu systems and edit /etc/logrotate.d/rsyslog and add the
+following settings under the `/var/log/syslog` section:
+
+    rotate 2000
+    daily
+    create
+    missingok
+    notifempty
+    delaycompress
+    compress
+    dateext
+    postrotate
+        invoke-rc.d rsyslog rotate > /dev/null
+    endscript
+
+Most of these are the default settings as of writing. The import parts are:
+
+1. `rotate 2000` indicates how long to keep logs. Because rotations are daily, this is
+2000 days.
+
+2. `daily` indicates a daily log rotation - a new archived log file will be created
+every day.
+
+3. `dateext` adds the date to the end of the compressed, archived log.
