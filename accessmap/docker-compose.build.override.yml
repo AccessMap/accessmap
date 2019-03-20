@@ -1,0 +1,11 @@
+version: '3.2'
+
+services:
+  tiles:
+    entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output http://$DEV_HOST:2015
+
+  webapp:
+    environment:
+      - ANALYTICS=${DEV_ANALYTICS:-no}
+      - ANALYTICS_KEY=${DEV_ANALYTICS_KEY}
+      - MAPBOX_TOKEN=${DEV_MAPBOX_TOKEN}
