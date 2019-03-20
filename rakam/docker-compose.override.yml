@@ -1,7 +1,6 @@
 version: '3.2'
 
 services:
-
   rakamdb:
     image: postgres:9.6.1
     environment:
@@ -14,6 +13,7 @@ services:
       - "${DB_VOLUME:-/docker/rakamdb}:/var/lib/postgresql/data/pgdata"
 
   rakam:
+    build: ./dockerfiles/rakam-waitfor
     environment:
       - RAKAM_CONFIG_STORE_ADAPTER_POSTGRESQL_URL=postgres://rakam:dummy@rakamdb:5432/rakam
       - RAKAM_CONFIG_LOCK__KEY=mylockKey
