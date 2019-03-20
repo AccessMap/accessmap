@@ -1,10 +1,11 @@
 version: '3.2'
 
 services:
-  # Build tiles
   tiles:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output https://$STAGING_HOST
 
   webapp:
     environment:
-      - ANALYTICS:${STAGING_ANALYTICS:-no}
+      - ANALYTICS=${STAGING_ANALYTICS:-no}
+      - ANALYTICS_KEY=${STAGING_ANALYTICS_KEY}
+      - MAPBOX_TOKEN=${STAGING_MAPBOX_TOKEN}
