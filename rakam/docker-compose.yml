@@ -1,8 +1,6 @@
 version: '3.2'
 
 services:
-
   rakam:
-    build: ./builds/rakam
     ports:
       - 9999:9999
