@@ -72,13 +72,15 @@ domain name URI, potentially with a subdomain, e.g. `stage.yourwebsite.com` or
 `MAPBOX_TOKEN`: An API access token from `mapbox.com`, used to geocode and get basemap
 tiles.
 
+`ANALYTICS`: Whether or not analytics is enabled. Set to "yes" to enable analytics,
+"no" to disable. If set to "no", the two following environment variables do not need to
+be set.
+
 `ANALYTICS_URL`: This does not need to be set in `development` mode, as it is
 assumed to be a local deployment from the `rakam` directory. In staging or production,
 this should be the base URL for the analytics endpoint and it should be secure to
 prevent MITM attacks: either a local URL at an endpoint not exposed to the internet
-(like a closed port) or over HTTPS. If you set `ANALYTICS=no` in any environment, this
-does not need to be set (note: this is currently hard-coded in the docker-compose
-files).
+(like a closed port) or over HTTPS.
 
 `ANALYTICS_KEY`: The write key for your `rakam` project. See the Analytics section for
 more information.
@@ -195,8 +197,7 @@ In production mode:
 
 AccessMap tracks user interactions to do research on user interactions and root out
 bugs. Analytics is not required to deploy AccessMap and can be disabled using
-`ANALYTICS=no` environment variable (this currently requries you to edit the
-`docker-compose.yml` build files)
+`ANALYTICS=no` environment variable.
 
 ### Running rakam
 
