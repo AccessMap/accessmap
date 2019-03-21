@@ -1,5 +1,8 @@
 """Defines cost function generators for optimal path finding."""
+from datetime import datetime
 import math
+import humanized_opening_hours as hoh
+import pytz
 
 ## Default base moving speeds for different modes. All in m/s.
 # Slightly lower than average walking speed
@@ -25,7 +28,7 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     return base * math.exp(-k * abs(grade - m))
 
 def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
-                       uphill=0.085, avoidCurbs=True):
+                       uphill=0.085, avoidCurbs=True, timestamp=None):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -40,6 +43,13 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
     """
     k_down = find_k(-downhill, INCLINE_IDEAL, DIVISOR)
     k_up = find_k(uphill, INCLINE_IDEAL, DIVISOR)
+
+    if timestamp is None:
+        date = datetime.now(pytz.timezone('US/Pacific'))
+    else:
+        # Unix epoch time is sent in integer format, but is in milliseconds. Divide by
+        # 1000
+        date = datetime.fromtimestamp(timestamp / 1000, pytz.timezone('US/Pacific'))
 
     def cost_fun(u, v, d):
         """Cost function that evaluates every edge, returning either a nonnegative cost
@@ -65,32 +75,48 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         if subclass == "footway":
             if "footway" in d:
                 if d["footway"] == "sidewalk":
-                    # FIXME: this data should be float to begin with
-                    incline = float(d["incline"])
-                    # Decrease speed based on incline
-                    if length > 3:
-                        if incline > uphill:
-                            return None
-                        if incline < -downhill:
-                            return None
-                    if incline > INCLINE_IDEAL:
-                        speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
-                    else:
-                        speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
-                else:
-                    if d["footway"] == "crossing":
-                        if avoidCurbs:
-                            if "curbramps" in d:
-                                if not d["curbramps"]:
-                                    return None
-                            else:
-                                # TODO: Make this user-configurable - we assume no
-                                # curb ramps by default now
+                   # FIXME: this data should be float to begin with
+                   incline = float(d["incline"])
+                   # Decrease speed based on incline
+                   if length > 3:
+                       if incline > uphill:
+                           return None
+                       if incline < -downhill:
+                           return None
+                   if incline > INCLINE_IDEAL:
+                       speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
+                   else:
+                       speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
+                elif d["footway"] == "crossing":
+                    if avoidCurbs:
+                        if "curbramps" in d:
+                            if not d["curbramps"]:
                                 return None
-                        # Add delay for crossing street
-                        # TODO: tune this based on street type crossed and/or markings.
-                        time += 30
-                    speed = base_speed
+                        else:
+                            # TODO: Make this user-configurable - we assume no
+                            # curb ramps by default now
+                            return None
+                    # Add delay for crossing street
+                    # TODO: tune this based on street type crossed and/or markings.
+                    time += 30
+                elif d["elevator"]:
+                    opening_hours = d['opening_hours']
+                    # Add delay for using the elevator
+                    time += 45
+                    # See if the elevator has limited hours
+                    try:
+                        oh = hoh.OHParser(opening_hours)
+                        if not oh.is_open(date):
+                            return None
+                    except KeyError:
+                        # 'opening_hours' isn't on this elevator path
+                        pass
+                    except ValueError:
+                        # 'opening_hours' is None (better option for checking?)
+                        pass
+                    except:
+                        # Something else went wrong. TODO: give a useful message back?
+                        return None
         else:
             # Unknown path type
             return None

@@ -12,6 +12,10 @@
     {
       "name": "downhill",
       "type": "fields.Number(validate=validate.Range(0, 15))"
+    },
+    {
+      "name": "timestamp",
+      "type": "fields.Integer()"
     }
   ],
   "cost_function": "cost-wheelchair.py",
