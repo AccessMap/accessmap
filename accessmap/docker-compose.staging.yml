@@ -18,7 +18,6 @@ services:
   caddy:
     restart: always
     volumes:
-      - ./config/caddy/Caddyfile.tls.staging:/etc/Caddyfile.tls
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80
@@ -26,3 +25,4 @@ services:
     environment:
       - ANALYTICS_URL=$STAGING_ANALYTICS_URL
       - HOST=${STAGING_HOST}
+      - ACME_AGREE=true

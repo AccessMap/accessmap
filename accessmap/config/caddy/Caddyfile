@@ -1,4 +1,6 @@
 {$HOST} {
+    tls accessmap.general@gmail.com
+
     root /webapp
 
     rewrite / {
@@ -33,11 +35,10 @@
 
     log stdout
     errors stderr
-
-    import Caddyfile.tls
 }
 
 {$HOST}/tiles {
+    tls accessmap.general@gmail.com
     root /tiles
 
     header / {
