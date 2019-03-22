@@ -1,5 +1,5 @@
 {$HOST} {
-    tls accessmap.general@gmail.com
+    import Caddyfile.tls
 
     root /webapp
 
@@ -38,7 +38,7 @@
 }
 
 {$HOST}/tiles {
-    tls accessmap.general@gmail.com
+    import Caddyfile.tls
     root /tiles
 
     header / {
