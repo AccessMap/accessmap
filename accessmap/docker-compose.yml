@@ -13,7 +13,7 @@ services:
       - ./build/router:/data:ro
 
   caddy:
-    image: abiosoft/caddy:0.10.10
+    image: abiosoft/caddy:0.11.5-no-stats
     volumes:
       - ./config/caddy/Caddyfile:/etc/Caddyfile:ro
       - ./build/tiles:/tiles:ro
