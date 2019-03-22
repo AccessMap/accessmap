@@ -13,7 +13,7 @@ services:
       - OSM_CLIENT_ID=$DEV_OSM_CLIENT_ID
       - OSM_CLIENT_SECRET=$DEV_OSM_CLIENT_SECRET
     volumes:
-      - /tmp/accessmap:/tmp/accessmap
+      - /tmp/accessmap/accessmap-api.db:/tmp/accessmap/accessmap-api.db
 
   router:
     ports:
