@@ -5,6 +5,9 @@ services:
     build:
       context: https://github.com/accessmap/accessmap-api.git#develop
     command: poetry run gunicorn --bind 0.0.0.0:5000 'wsgi:build_app(endpoint="/api/v1")'
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
   router:
     build: ./dockerfiles/unweaver
