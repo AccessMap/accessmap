@@ -5,6 +5,8 @@ services:
     entrypoint: sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output https://$PROD_HOST
 
   webapp:
+    build:
+      context: https://github.com/accessmap/accessmap-webapp.git#v1.0
     environment:
       - ANALYTICS=${PROD_ANALYTICS:-no}
       - ANALYTICS_KEY=${PROD_ANALYTICS_KEY}

@@ -2,6 +2,8 @@ version: '3.2'
 
 services:
   api:
+    build:
+      context: https://github.com/accessmap/accessmap-api.git#v1.0
     restart: always
     environment:
       - SECRET_KEY=$PROD_API_SECRET
@@ -18,7 +20,7 @@ services:
   caddy:
     restart: always
     volumes:
-      - ./config/Caddyfile.tls.staging:/etc/Caddyfile.tls
+      - ./config/caddy/Caddyfile.tls.prod:/etc/Caddyfile.tls
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80
@@ -26,3 +28,4 @@ services:
     environment:
       - ANALYTICS_URL=$PROD_ANALYTICS_URL
       - HOST=${PROD_HOST}
+      - ACME_AGREE=true
