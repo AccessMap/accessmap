@@ -1,7 +1,7 @@
 FROM python:3.6-stretch
 MAINTAINER Nick Bolten <nbolten@gmail.com>
 
-ARG GIT_HASH="36e669efb0b72558d050fc07b530940fe9cd7d97"
+ARG GIT_HASH="916e63dd3c10d3827133a98bd65bdd67e6692ca8"
 
 RUN apt-get update && \
     apt-get install -y \
