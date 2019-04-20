@@ -1,0 +1,15 @@
+accessmap.io {
+  redir https://www.accessmap.io
+}
+
+www.accessmap.io {
+    tls accessmap.general@gmail.com
+
+    import Caddyfile.shared
+}
+
+www.accessmap.io/tiles {
+    tls accessmap.general@gmail.com
+
+    import Caddyfile.tiles.shared
+}
