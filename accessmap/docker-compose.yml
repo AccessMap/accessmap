@@ -18,7 +18,8 @@ services:
   caddy:
     image: abiosoft/caddy:0.11.5-no-stats
     volumes:
-      - ./config/caddy/Caddyfile:/etc/Caddyfile:ro
+      - ./config/caddy/Caddyfile.shared:/etc/Caddyfile.shared
+      - ./config/caddy/Caddyfile.tiles.shared:/etc/Caddyfile.tiles.shared
       - ./build/tiles:/tiles:ro
       - ./build/webapp:/webapp
     links:

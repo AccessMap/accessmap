@@ -1,6 +1,3 @@
-{$HOST} {
-    import Caddyfile.tls
-
     root /webapp
 
     rewrite / {
@@ -35,35 +32,3 @@
 
     log stdout
     errors stderr
-}
-
-{$HOST}/tiles {
-    import Caddyfile.tls
-    root /tiles
-
-    header / {
-        Access-Control-Allow-Origin *
-        Content-Type application/vnd.mapbox-vector-tile
-        Content-Encoding gzip
-    }
-
-    header /tilejson {
-        Content-Type text/plain
-        -Content-Encoding
-    }
-
-    header /nocontent {
-        -Content-Type
-        -Content-Encoding
-    }
-
-    status 204 /nocontent
-
-    rewrite {
-      to {rewrite_path} /nocontent
-    }
-
-    # Log to places that journalctl will find
-    log / stdout "{remote} - {user} [{when}] \"{method} {uri} {proto}\" {status} {size} - {path} -> {rewrite_path}"
-    # errors stderr
-}

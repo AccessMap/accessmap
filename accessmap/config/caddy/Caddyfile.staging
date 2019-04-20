@@ -1,0 +1,11 @@
+${HOST} {
+    tls accessmap.general@gmail.com
+
+    import Caddyfile.shared
+}
+
+${HOST}/tiles {
+    tls accessmap.general@gmail.com
+
+    import Caddyfile.tiles.shared
+}

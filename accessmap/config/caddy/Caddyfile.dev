@@ -1,0 +1,11 @@
+${HOST} {
+    tls off
+
+    import Caddyfile.shared
+}
+
+${HOST}/tiles {
+    tls off
+
+    import Caddyfile.tiles.shared
+}
