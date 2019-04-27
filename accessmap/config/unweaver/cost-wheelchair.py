@@ -122,7 +122,7 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
             return None
 
         # Initial time estimate (in seconds) - based on speed
-        time = length / speed
+        time += length / speed
 
         # Return time estimate - this is currently the cost
         return time
