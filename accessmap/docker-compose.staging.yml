@@ -18,7 +18,7 @@ services:
   caddy:
     restart: always
     volumes:
-      - ./config/caddy/Caddyfile.tls.staging:/etc/Caddyfile.tls
+      - ./config/caddy/Caddyfile.staging:/etc/Caddyfile
       - /docker/.caddy:/root/.caddy
     ports:
       - 80:80

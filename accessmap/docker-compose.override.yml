@@ -36,4 +36,4 @@ services:
       - -c
       - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
     volumes:
-      - ./config/caddy/Caddyfile.tls.dev:/etc/Caddyfile.tls
+      - ./config/caddy/Caddyfile.dev:/etc/Caddyfile
