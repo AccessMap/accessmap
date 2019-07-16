@@ -1,5 +1,5 @@
 accessmap.io {
-  redir https://www.accessmap.io
+  redir https://www.accessmap.io{uri}
 }
 
 www.accessmap.io {
