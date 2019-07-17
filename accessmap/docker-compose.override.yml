@@ -8,12 +8,12 @@ services:
       - SECRET_KEY=unsafedevsecret
       - JWT_SECRET_KEY=unsafejwtsecret
       - CONSUMER_CALLBACK_URI=${DEV_CONSUMER_CALLBACK_URI:-http://localhost:2015/login_callback}
-      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap/accessmap-api.db
+      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap-api/api.db
       - OSM_URI=${DEV_OSM_URI:-https://master.apis.dev.openstreetmap.org/}
       - OSM_CLIENT_ID=$DEV_OSM_CLIENT_ID
       - OSM_CLIENT_SECRET=$DEV_OSM_CLIENT_SECRET
     volumes:
-      - /tmp/accessmap/accessmap-api.db:/tmp/accessmap/accessmap-api.db
+      - /tmp/accessmap-api/:/tmp/accessmap-api/
 
   router:
     ports:
