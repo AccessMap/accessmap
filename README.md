@@ -1,7 +1,5 @@
 # AccessMap
 
-![AccessMap orchestration diagram](orchestration-diagram.png)
-
 This repo contains all of the infrastructure needed to create and run AccessMap except
 for the data, which can be generated using the `accessmap-data` repo. These are the
 AccessMap-specific software projects used to deploy AccessMap:
@@ -13,6 +11,12 @@ AccessMap-specific software projects used to deploy AccessMap:
 - [AccessMap Users API](https://github.com/accessmap/accessmap-api)
 
 - [AccessMap Data ETL Pipeline (to get data)](https://github.com/accessmap/accessmap-data)
+
+The full pipeline of how AccessMap is deployed can be seen in this diagram:
+
+![AccessMap orchestration diagram](orchestration-diagram.png)
+
+## Deployment strategy
 
 AccessMap is currently deployed using `docker-compose`, so the documentation will
 assume some familiarity with the command line and `docker`.
