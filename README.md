@@ -1,52 +1,42 @@
-# AccessMap Orchestration
+# AccessMap
 
 ![AccessMap orchestration diagram](orchestration-diagram.png)
 
-This repo contains the `docker-compose` orchestration scripts and setup for AccessMap.
+This repo contains all of the infrastructure needed to create and run AccessMap except
+for the data, which can be generated using the `accessmap-data` repo. These are the
+AccessMap-specific software projects used to deploy AccessMap:
 
-It is set up to support a dev-staging-production workflow, whereby local testing can
-be done in `development` mode with debug messages and (potentially) less secure
-methods, while `staging` and `production` (`prod`) modes are optimized for speed, do
-not show debug methods, and use best practices security.
+- [AccessMap Web App (React-based)](https://github.com/accessmap/accessmap-webapp)
+
+- [`unweaver`: our flexible routing engine](https://github.com/nbolten/unweaver)
+
+- [AccessMap Users API](https://github.com/accessmap/accessmap-api)
+
+- [AccessMap Data ETL Pipeline (to get data)](https://github.com/accessmap/accessmap-data)
+
+AccessMap is currently deployed using `docker-compose`, so the documentation will
+assume some familiarity with the command line and `docker`.
+
+AccessMap uses a 3-stage development-staging-production workflow, wherein new ideas
+can be tested out in feature branches, merged to develop, tested on a staged copy
+of the production application, and finally released:
+
+- New features/branches are developed for the appropriate services, each of which have
+their own repository.
+
+- The default deployment mode is `develop`, which will use temporary databases and
+deploy directly from `#develop` branches of each service's repository.
+
+- Staging mode is entered by cascading `docker-compose` configs and acts exactly like
+production mode. Different endpoints and databases should be used in staging vs.
+production.
+
+- Production mode is entered by cascading `docker-compose` configs.
 
 ## Configuration
 
-AccessMap requires two types of configuration: (1) Data for routing, generating tiles,
-and defining regions served by the application (e.g. multiple cities), and (2)
-environment variables dictating how the deployments run.
-
-### Getting data
-
-For a deployment to work, you need to places two files in the `data/` directory:
-`transportation.geojson` and `regions.geojson`.
-
-#### Aside: where do I get these files?
-
-For now, the best way to get AccessMap data is to run our reproducible ETL pipelines
-in the `accessmap-data` repository: https://github.com/accessmap/accessmap-data. Note
-that you may want to use the `develop` branch to get the latest build process. Using
-the `accessmap-data` repository, you can run `snakemake -j 8` in each `cities`
-subdirectory and then `python ./merge.py` to get all the data you need for this
-deployment: `transportation.geojson` and `regions.geojson`.
-
-#### `transportation.geojson`
-
-This GeoJSON file describes the pedestrian network for a given region and contains
-features like sidewalks, crosswalks, and curb data. It follows the OpenMapTiles tile
-`transportation` layer schema, with a few extensions (read the `accessmap-data` README
-for more information). This will be used as the data for routing in the `unweaver`
-routing engine that powers AccessMap and will become the `transportation` layer in
-the `pedestrian` tileset served by AccessMap.
-
-#### `regions.geojson`
-
-This GeoJSON file describes the regions served by this instance of AccessMap and is
-auto-generated as part of the `accessmap-data` ETL pipeline. Each feature has a
-geometry (the convex hull) of the region served and has metadata used to define front
-end interactions, such as where to center the map, the name and unique key of the
-region, and its `[W,S,E,N]` bounding box. This data is embedded in the front end via
-the `webapp` service.
-
+An AccessMap deployment is configured by (1) environment variables and (2) the data
+provided.
 
 ### Environment variables
 
@@ -111,18 +101,51 @@ defaults to `http://localhost:2015/login_callback`.
 test features in both the OpenStreetMap sandbox and then on the primary OSM deployment.
 It is the base URL for the OpenStreetMap API to use.
 
+### Getting data
+
+For a deployment to work, you need to places two files in the `data/` directory:
+`transportation.geojson` and `regions.geojson`. We would like to publish these data
+so that they can be more easily acquired, but haven't found the right resource to do
+so in a low-cost, versioned manner. Until then, they need to be generated using our
+open source ETL pipelines or shared by our team:
+https://github.com/accessmap/accessmap-data.
+
+#### `transportation.geojson`
+
+This is produced by our open ETL pipeline: https://github.com/accessmap/accessmap-data.
+
+This GeoJSON file describes the pedestrian network for a given region and contains
+features like sidewalks, crosswalks, and curb data. It follows the OpenMapTiles tile
+`transportation` layer schema, with a few extensions (read the `accessmap-data` README
+for more information). This will be used as the data for routing in the `unweaver`
+routing engine that powers AccessMap and will become the `transportation` layer in
+the `pedestrian` tileset served by AccessMap.
+
+#### `regions.geojson`
+
+This is produced by our open ETL pipeline: https://github.com/accessmap/accessmap-data.
+
+This GeoJSON file describes the regions served by this instance of AccessMap and is
+auto-generated as part of the `accessmap-data` ETL pipeline. Each feature has a
+geometry (the convex hull) of the region served and has metadata used to define front
+end interactions, such as where to center the map, the name and unique key of the
+region, and its `[W,S,E,N]` bounding box. This data is embedded in the front end via
+the `webapp` service.
+
+
 ## Running a deployment
 
-`docker-compose` has an awkward system for managing different deployment environments
-that depends on explicitly cascading different configuration files whenever you run
-a `docker-compose` command. AccessMap uses a bunch of docker-compose files to make this
-workflow possible.
+`docker-compose` has an awkward system for managing different deployment environments:
+cascading config files.
 
-`docker-compose` also does not have a good way to separate out long-running services
-from those that only need to be run once or very infrequently, so we use separate
-configuration files for the `build` steps (compiling the web app, creating the routing
-graph, creating vector tiles) from the `run` steps (running the reverse proxy, the
-routing engine, the API).
+In addition, there are different stages of an AccessMap deployment, some of which use
+their own configs:
+
+1. Building assets (uses `.build.yml` configs).
+
+2. Running database migrations (uses main configs but requires separate command).
+
+3. Deploying live AccessMap services (uses main configs).
 
 ### Building assets
 
@@ -135,7 +158,7 @@ environments, cascade the configs. Examples:
 
 In development mode:
 
-    `docker-compose -f docker-compose.build.yml up`
+    `docker-compose -f docker-compose.build.yml -f docker-compose.build.override up`
 
 In staging mode:
 
@@ -174,12 +197,10 @@ run the same command as above:
 
     docker-compose run api poetry run flask db upgrade
 
-Be careful about doing such migrations on a production service - you may often need to
-use intermediate database schemas to transition from an old schema to a new schema,
-where data is copied to multiple tables until all clients have transitioned to the new
-schema.
+Be careful about doing such migrations on a production service: you may need to shut
+it down during the migration (or do something complicated).
 
-### Long-running services
+### Running Accessmap services
 
 AccessMap deploys a few long-running services: a reverse proxy that handles HTTPS
 security and routes (caddy), an instance of the routing engine, and an instance of the
@@ -199,9 +220,9 @@ In production mode:
 
 ## Analytics
 
-AccessMap tracks user interactions to do research on user interactions and root out
-bugs. Analytics is not required to deploy AccessMap and can be disabled using
-`ANALYTICS=no` environment variable.
+AccessMap tracks website interactions to do research on user interactions and root out
+bugs. Analytics can be disabled by the user, is not required to deploy AccessMap, and
+can be disabled at the server level using the `ANALYTICS=no` environment variable.
 
 ### Running rakam
 
@@ -226,8 +247,7 @@ be treated as root access to the analytics server and database. Make it secret!
 - `RAKAM_DB_URL`: The JDBC-compatible database URL. Using SSL is strongly recommended.
 AccessMap uses the postgres driver.
 
-
-### Getting a key
+### Getting an analytics project key
 
 `rakam` operates on the basis of "projects", which are isolated namespaces in the
 analytics database. It is a good idea to create a new project for every new study you
