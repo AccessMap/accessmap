@@ -6,7 +6,7 @@ services:
 
   webapp:
     build:
-      context: https://github.com/accessmap/accessmap-webapp.git#v1.0.5
+      context: https://github.com/accessmap/accessmap-webapp.git#v1.0.6
     environment:
       - ANALYTICS=${STAGING_ANALYTICS:-no}
       - ANALYTICS_KEY=${STAGING_ANALYTICS_KEY}
