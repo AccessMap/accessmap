@@ -27,5 +27,5 @@ services:
       context: https://github.com/accessmap/accessmap-webapp.git#develop
     command: npm run build
     volumes:
-      - ./data/regions.geojson:/www/public/regions.json:ro
       - ./build/webapp:/www/public
+      - ./data/regions.geojson:/www/regions.json:ro
