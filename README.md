@@ -162,7 +162,7 @@ environments, cascade the configs. Examples:
 
 In development mode:
 
-    `docker-compose -f docker-compose.build.yml -f docker-compose.build.override up`
+    `docker-compose -f docker-compose.build.yml -f docker-compose.build.override.yml up`
 
 In staging mode:
 
