@@ -72,6 +72,10 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         length = d["length"]
         subclass = d["subclass"]
 
+        if subclass == "service":
+            speed = base_speed
+        if subclass == "pedestrian":
+            speed = base_speed
         if subclass == "footway":
             if "footway" in d:
                 if d["footway"] == "sidewalk":
@@ -99,24 +103,8 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     # Add delay for crossing street
                     # TODO: tune this based on street type crossed and/or markings.
                     time += 30
-                elif d["elevator"]:
-                    opening_hours = d['opening_hours']
-                    # Add delay for using the elevator
-                    time += 45
-                    # See if the elevator has limited hours
-                    try:
-                        oh = hoh.OHParser(opening_hours)
-                        if not oh.is_open(date):
-                            return None
-                    except KeyError:
-                        # 'opening_hours' isn't on this elevator path
-                        pass
-                    except ValueError:
-                        # 'opening_hours' is None (better option for checking?)
-                        pass
-                    except:
-                        # Something else went wrong. TODO: give a useful message back?
-                        return None
+            else:
+                speed = base_speed
         else:
             # Unknown path type
             return None

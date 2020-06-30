@@ -1,10 +1,12 @@
-{$HOST} {
+localhost:2014
+
+{
     tls off
 
     import Caddyfile.shared
 }
 
-{$HOST}/tiles {
+localhost:2014/tiles {
     tls off
 
     import Caddyfile.tiles.shared

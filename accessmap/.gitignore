@@ -5,3 +5,5 @@ data/*
 !data/.gitkeep
 build/*
 !build/.gitkeep
+.DS_Store
+config/.DS_Store

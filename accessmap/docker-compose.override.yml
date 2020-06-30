@@ -23,7 +23,7 @@ services:
 
   caddy:
     ports:
-      - 2015:2015
+      - 2014:2014
     environment:
       - ANALYTICS_URL=host.docker.internal:9999
       - HOST=${DEV_HOST}
