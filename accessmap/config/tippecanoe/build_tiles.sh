@@ -11,6 +11,7 @@ mkdir -p ${outputdir}/tilejson
 # Build pedestrian network layer
 tippecanoe -f -Z 6 -z 14 -B 14 -r 2.5 \
     -L transportation:${inputdir}/transportation.geojson \
+    -L barriers:${inputdir}/barriers.geojson \
     -e ${outputdir}/pedestrian
 
 cp /home/tippecanoe/pedestrian.json ${outputdir}/tilejson/pedestrian.json

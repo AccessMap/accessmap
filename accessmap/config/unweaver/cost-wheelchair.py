@@ -28,7 +28,7 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     return base * math.exp(-k * abs(grade - m))
 
 def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
-                       uphill=0.085, avoidCurbs=True, timestamp=None):
+                       uphill=0.085, avoidCurbs=True, timestamp=None, tactilePaving=False):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -70,44 +70,23 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         speed = base_speed
 
         length = d["length"]
-        subclass = d["subclass"]
+        landmark_count = d["count_sum"]
 
-        if subclass == "service":
-            speed = base_speed
-        if subclass == "pedestrian":
-            speed = base_speed
-        if subclass == "footway":
-            if "footway" in d:
-                if d["footway"] == "sidewalk":
-                   # FIXME: this data should be float to begin with
-                   incline = float(d["incline"])
-                   # Decrease speed based on incline
-                   if length > 3:
-                       if incline > uphill:
-                           return None
-                       if incline < -downhill:
-                           return None
-                   if incline > INCLINE_IDEAL:
-                       speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
-                   else:
-                       speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
-                elif d["footway"] == "crossing":
-                    if avoidCurbs:
-                        if "curbramps" in d:
-                            if not d["curbramps"]:
-                                return None
-                        else:
-                            # TODO: Make this user-configurable - we assume no
-                            # curb ramps by default now
-                            return None
-                    # Add delay for crossing street
-                    # TODO: tune this based on street type crossed and/or markings.
-                    time += 30
+        if length > 3:
+            speed = base_speed + math.e ** (0.2 * landmark_count)
+        if d["subclass"] == "service" or d["subclass"] == "cycleway":
+            return None
+        if d["footway"] == "crossing":
+            if tactilePaving:
+                if "tactile_paving" in d:
+                    if not d["tactile_paving"]:
+                        return None
+            if avoidCurbs:
+                if "curbramps" in d:
+                    if not d["curbramps"]:
+                        return None
             else:
                 speed = base_speed
-        else:
-            # Unknown path type
-            return None
 
         # Initial time estimate (in seconds) - based on speed
         time += length / speed
@@ -116,3 +95,82 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         return time
 
     return cost_fun
+
+"""
+initial try - simple multiplication
+
+time = 0
+speed = base_speed
+
+length = d["length"]
+landmark_count = d["count_sum"]
+
+if length > 3:
+    speed = base_speed * (landmark_count + 1)
+if d["subclass"] == "service":
+    return None
+if d["footway"] == "crossing":
+    if tactilePaving:
+        if "tactile_paving" in d:
+            if not d["tactile_paving"]:
+                return None
+    if avoidCurbs:
+        if "curbramps" in d:
+            if not d["curbramps"]:
+                return None
+    else:
+        speed = base_speed
+"""
+
+"""
+ORIGINAL CODE:
+
+time = 0
+speed = base_speed
+
+length = d["length"]
+subclass = d["subclass"]
+
+if subclass == "service":
+    speed = base_speed
+elif subclass == "pedestrian":
+    speed = base_speed
+elif subclass == "path":
+    speed = base_speed
+elif subclass == "footway":
+    if "footway" in d:
+        if d["footway"] == "sidewalk":
+            # FIXME: this data should be float to begin with
+            incline = float(d["incline"])
+            # Decrease speed based on incline
+            if length > 3:
+                if incline > uphill:
+                    return None
+                if incline < -downhill:
+                    return None
+            if incline > INCLINE_IDEAL:
+                speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
+            else:
+                speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
+        elif d["footway"] == "crossing":
+            if tactilePaving:
+                if "tactile_paving" in d:
+                    if not d["tactile_paving"]:
+                        return None
+            if avoidCurbs:
+                if "curbramps" in d:
+                    if not d["curbramps"]:
+                        return None
+                else:
+                    # TODO: Make this user-configurable - we assume no
+                    # curb ramps by default now
+                    return None
+            # Add delay for crossing street
+            # TODO: tune this based on street type crossed and/or markings.
+            time += 30
+    else:
+        speed = base_speed
+else:
+    # Unknown path type
+    return None
+"""

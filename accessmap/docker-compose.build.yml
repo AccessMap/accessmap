@@ -19,6 +19,7 @@ services:
       - ./config/tippecanoe/regions-tilejson.json:/home/tippecanoe/regions.json:ro
       - ./data/transportation.geojson:/home/tippecanoe/input/transportation.geojson:ro
       - ./data/regions.geojson:/home/tippecanoe/input/regions.geojson:ro
+      - ./data/barriers.geojson:/home/tippecanoe/input/barriers.geojson:ro
       - ./build/tiles:/home/tippecanoe/output:rw
 
   # Build webapp into static assets
