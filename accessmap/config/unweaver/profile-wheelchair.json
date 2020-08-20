@@ -6,12 +6,20 @@
       "type": "fields.Boolean()"
     },
     {
+      "name": "tactilePaving",
+      "type": "fields.Boolean()"
+    },
+    {
       "name": "uphill",
       "type": "fields.Number(validate=validate.Range(0, 10))"
     },
     {
       "name": "downhill",
       "type": "fields.Number(validate=validate.Range(0, 15))"
+    },
+    {
+      "name": "landmark",
+      "type": "fields.Number(validate=validate.Range(0, 1))"
     },
     {
       "name": "timestamp",
