@@ -27,8 +27,14 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     # Modified to be in meters / second rather than km / h
     return base * math.exp(-k * abs(grade - m))
 
-def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
-                       uphill=0.085, avoidCurbs=True, timestamp=None, tactilePaving=False, landmark=0.2, noStairs=True):
+def cost_fun_generator(base_speed=WALK_BASE,
+                       downhill=0.1,
+                       uphill=0.085,
+                       avoidCurbs=True,
+                       timestamp=None,
+                       tactilePaving=False,
+                       landmark=0.2,
+                       steps=0.5):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -77,10 +83,10 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         if d["subclass"] == "service" or d["subclass"] == "cycleway":
             return None
         if d["subclass"] == "steps":
-            if noStairs:
+            if steps == 1:
                 return None
             else:
-                speed = (0.8 * base_speed)
+                speed = base_speed + math.e ** (-1 * steps)
         if d["footway"] == "crossing":
             if tactilePaving:
                 if "tactile_paving" in d:
@@ -91,17 +97,17 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     if not d["curbramps"]:
                         return None
             else:
-                if d["traffic_signals"] == 0 or d["traffic_signals"] == 4:
+                if d["traffic_signals"] == "traffic_lights":
+                    speed = 1 * base_speed
+                elif d["traffic_signals"] == "stop_sign":
+                    speed = 0.6 * base_speed
+                elif d["traffic_signals"] == "pedestrian_sign":
+                    speed = 0.4 * base_speed
+                else:
                     if d["crossing"] == "marked":
                         speed = 0.2 * base_speed
                     else:
                         speed = 0.1 * base_speed
-                elif d["traffic_signals"] == 1:
-                    speed = 1 * base_speed
-                elif d["traffic_signals"] == 2:
-                    speed = 0.6 * base_speed
-                elif d["traffic_signals"] == 3:
-                    speed = 0.4 * base_speed
 
         # Initial time estimate (in seconds) - based on speed
         time += length / speed
