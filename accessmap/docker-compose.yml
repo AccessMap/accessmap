@@ -3,7 +3,7 @@ version: '3.2'
 services:
   api:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
+      context: ../../accessmap-api
     command: poetry run gunicorn --bind 0.0.0.0:5000 'wsgi:build_app(endpoint="/api/v1")'
     dns:
       - 8.8.8.8

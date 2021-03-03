@@ -1,14 +1,11 @@
-accessmap.io {
-  redir https://www.accessmap.io{uri}
-}
 
-www.accessmap.io {
+vi.accessmap.io {
     tls accessmap.general@gmail.com
 
     import Caddyfile.shared
 }
 
-www.accessmap.io/tiles {
+vi.accessmap.io/tiles {
     tls accessmap.general@gmail.com
 
     import Caddyfile.tiles.shared

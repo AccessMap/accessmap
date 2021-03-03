@@ -25,7 +25,7 @@ services:
   # Build webapp into static assets
   webapp:
     build:
-      context: https://github.com/accessmap/accessmap-webapp.git#develop
+      context: ../../accessmap-webapp
     command: npm run build
     volumes:
       - ./build/webapp:/www/public
