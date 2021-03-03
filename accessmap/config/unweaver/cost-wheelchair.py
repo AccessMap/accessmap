@@ -34,7 +34,8 @@ def cost_fun_generator(base_speed=WALK_BASE,
                        timestamp=None,
                        tactilePaving=False,
                        landmark=0.2,
-                       steps=0.5):
+                       steps=0.5,
+                       crossing=0.6):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -78,12 +79,9 @@ def cost_fun_generator(base_speed=WALK_BASE,
         cost = length
         landmark_count = d["count_sum"]
         subclass = d["subclass"]
-
+        if subclass == "cycleway":
+            return None
         if length > 3:
-            if subclass == "cycleway": 
-                if "foot" in d:
-                    if not d["foot"]:
-                        return None
             # when landmark is 0, cost is unchanged
             # as landmark goes to 1, cost decreases
             cost = length / (math.e ** (landmark * landmark_count))
