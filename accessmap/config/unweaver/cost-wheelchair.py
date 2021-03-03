@@ -74,46 +74,56 @@ def cost_fun_generator(base_speed=WALK_BASE,
         """
         time = 0
         speed = base_speed
-
         length = d["length"]
+        cost = length
         landmark_count = d["count_sum"]
+        subclass = d["subclass"]
 
         if length > 3:
-            speed = base_speed + math.e ** (landmark * landmark_count)
-        if d["subclass"] == "service" or d["subclass"] == "cycleway":
-            return None
-        if d["subclass"] == "steps":
+            if subclass == "cycleway": 
+                if "foot" in d:
+                    if not d["foot"]:
+                        return None
+            # when landmark is 0, cost is unchanged
+            # as landmark goes to 1, cost decreases
+            cost = length / (math.e ** (landmark * landmark_count))
+            # speed = base_speed + ((math.e ** (landmark * landmark_count)) - 1)
+        if subclass == "steps":
             if steps == 1:
                 return None
             else:
-                speed = base_speed + math.e ** (-1 * steps)
-        if d["footway"] == "crossing":
-            if tactilePaving:
-                if "tactile_paving" in d:
-                    if not d["tactile_paving"]:
-                        return None
-            if avoidCurbs:
-                if "curbramps" in d:
-                    if not d["curbramps"]:
-                        return None
-            else:
-                if d["traffic_signals"] == "traffic_lights":
-                    speed = 1 * base_speed
-                elif d["traffic_signals"] == "stop_sign":
-                    speed = 0.6 * base_speed
-                elif d["traffic_signals"] == "pedestrian_sign":
-                    speed = 0.4 * base_speed
+                # when steps is 0, cost is unchanged
+                # as steps goes to 1, cost should increase
+                cost = (math.e ** (steps * 1.5)) * length
+                # speed = 0.8 * base_speed + ((math.e ** (1 - steps)) - 1)
+        if "footway" in d:
+            if d["footway"] == "crossing":
+                if tactilePaving:
+                    if "tactile_paving" in d:
+                        if not d["tactile_paving"]:
+                            return None
+                if avoidCurbs:
+                    if "curbramps" in d:
+                        if not d["curbramps"]:
+                            return None
                 else:
-                    if d["crossing"] == "marked":
-                        speed = 0.2 * base_speed
+                    # when crossing is 0, cost is unchanged
+                    # as crossing goes to 1, cost of uncontrolled increases and cost of controlled decreases
+                    # original cost is x2 to disincentivize crossings as a whole
+                    if "traffic_signals" in d:
+                        if d["traffic_signals"] == "traffic_lights":
+                            cost = (2 * length) / (math.e ** (crossing * 2))
+                        elif d["traffic_signals"] == "stop_sign":
+                            cost = ((2 + (crossing * 1.5))  * length) / (math.e ** (crossing * 0.7))
+                        elif d["traffic_signals"] == "pedestrian_sign":
+                            cost = ((2 + (crossing * 2)) * length) / (math.e ** (crossing * 0.3))
                     else:
-                        speed = 0.1 * base_speed
+                        if d["crossing"] == "marked":
+                            cost = ((2 + (crossing * 2.5)) * length) / (math.e ** (crossing * 0.1))
+                        else:
+                            cost = ((2 + (crossing * 3)) * length) / (math.e ** (crossing * 0.05))
 
-        # Initial time estimate (in seconds) - based on speed
-        time += length / speed
-
-        # Return time estimate - this is currently the cost
-        return time
+        return cost
 
     return cost_fun
 
