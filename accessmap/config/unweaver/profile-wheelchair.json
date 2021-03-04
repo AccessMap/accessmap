@@ -1,4 +1,5 @@
 {
+  "id": "wheelchair",
   "name": "wheelchair",
   "args": [
     {
@@ -10,15 +11,15 @@
       "type": "fields.Boolean()"
     },
     {
-      "name": "uphill",
-      "type": "fields.Number(validate=validate.Range(0, 10))"
-    },
-    {
-      "name": "downhill",
-      "type": "fields.Number(validate=validate.Range(0, 15))"
-    },
-    {
       "name": "landmark",
+      "type": "fields.Number(validate=validate.Range(0, 1))"
+    },
+    {
+      "name": "steps",
+      "type": "fields.Number(validate=validate.Range(0, 1))"
+    },
+    {
+      "name": "crossing",
       "type": "fields.Number(validate=validate.Range(0, 1))"
     },
     {
