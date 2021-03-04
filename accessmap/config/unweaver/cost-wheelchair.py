@@ -46,7 +46,7 @@ def cost_fun_generator(base_speed=WALK_BASE,
 
         if subclass == "cycleway":
             return None
-        elif subclass == "steps":
+        if subclass == "steps":
             if steps == 1:
                 return None
             else:
@@ -54,12 +54,12 @@ def cost_fun_generator(base_speed=WALK_BASE,
                 # as steps goes to 1, cost should increase
                 cost = (math.e ** (steps * 1.5)) * length
                 # speed = 0.8 * base_speed + ((math.e ** (1 - steps)) - 1)
-        elif length > 3:
+        if length > 3:
             # when landmark is 0, cost is unchanged
             # as landmark goes to 1, cost decreases
             cost = length / (math.e ** (landmark * landmark_count))
             # speed = base_speed + ((math.e ** (landmark * landmark_count)) - 1)
-        elif "footway" in d:
+        if "footway" in d:
             if d["footway"] == "crossing":
                 if tactilePaving:
                     if "tactile_paving" in d:
