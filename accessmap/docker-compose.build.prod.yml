@@ -6,7 +6,7 @@ services:
 
   webapp:
     build:
-      context: https://github.com/accessmap/accessmap-webapp.git#v1.0.6
+      context: https://github.com/accessmap/accessmap-webapp.git#microsoft_campus
     environment:
       - ANALYTICS=${PROD_ANALYTICS:-no}
       - ANALYTICS_KEY=${PROD_ANALYTICS_KEY}

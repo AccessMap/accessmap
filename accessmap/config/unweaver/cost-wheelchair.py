@@ -99,7 +99,7 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     # Add delay for crossing street
                     # TODO: tune this based on street type crossed and/or markings.
                     time += 30
-                elif d["elevator"]:
+                elif d.get("elevator", False):
                     opening_hours = d['opening_hours']
                     # Add delay for using the elevator
                     time += 45

@@ -3,7 +3,7 @@ version: '3.2'
 services:
   api:
     build:
-      context: https://github.com/accessmap/accessmap-api.git#v0.1.1
+      context: https://github.com/accessmap/accessmap-api.git#develop
     restart: always
     environment:
       - SECRET_KEY=$PROD_API_SECRET
