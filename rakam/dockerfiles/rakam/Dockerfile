@@ -4,7 +4,7 @@ MAINTAINER Burak Emre Kabakci "emre@rakam.io"
 WORKDIR /var/app
 
 # Fetch specific commit (since there's no versions...)
-RUN git clone https://github.com/rakam-io/rakam.git
+RUN git clone https://github.com/rakam-io/rakam-api.git
 RUN cd rakam && git checkout a04b7b85906243d41b9c826fe846dc780c4097f2
 
 RUN cd rakam && mvn install -DskipTests
