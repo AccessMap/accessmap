@@ -258,7 +258,7 @@ analytics database. It is a good idea to create a new project for every new stud
 do, e.g. for A/B testing.
 
 `rakam` uses a web API to manage the creation of projects. To create a new one, you
-need to have the `RAKAM_CONFIG_LOCK_KEY` credential mentioned above and create a
+need to have the `RAKAM_CONFIG_LOCK__KEY` credential mentioned above and create a
 request to the endpoint. An example in development mode:
 
     curl --request POST --url http://localhost:9999/analytics/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
