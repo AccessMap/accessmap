@@ -1,32 +1,17 @@
-version: '3.2'
+version: '3.8'
 
 services:
   api:
     ports:
       - 5000:5000
-    environment:
-      - SECRET_KEY=unsafedevsecret
-      - JWT_SECRET_KEY=unsafejwtsecret
-      - CONSUMER_CALLBACK_URI=${DEV_CONSUMER_CALLBACK_URI:-http://localhost:2015/login_callback}
-      - SQLALCHEMY_DATABASE_URI=sqlite:////tmp/accessmap-api/api.db
-      - OSM_URI=${DEV_OSM_URI:-https://master.apis.dev.openstreetmap.org/}
-      - OSM_CLIENT_ID=$DEV_OSM_CLIENT_ID
-      - OSM_CLIENT_SECRET=$DEV_OSM_CLIENT_SECRET
-    volumes:
-      - /tmp/accessmap-api/:/tmp/accessmap-api/
 
   router:
     ports:
       - 5656:5656
-    environment:
-      - SERVER_PORT=5656
 
   caddy:
     ports:
       - 2015:2015
-    environment:
-      - ANALYTICS_URL=host.docker.internal:9999
-      - HOST=${DEV_HOST}
     entrypoint:
       # A hack for the non-existence of docker.host.internal as of docker version 18:
       # rakam is launched separately (as it can be used by multiple services and claims
@@ -35,5 +20,3 @@ services:
       - /bin/sh
       - -c
       - ip -4 route list match 0/0 | awk '{print $$3" host.docker.internal"}' >> /etc/hosts && /usr/bin/caddy --conf /etc/Caddyfile --log stdout
-    volumes:
-      - ./config/caddy/Caddyfile.dev:/etc/Caddyfile

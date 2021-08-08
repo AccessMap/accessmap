@@ -1,8 +1,8 @@
 # AccessMap
 
-This repo contains all of the infrastructure needed to create and run AccessMap except
-for the data, which can be generated using the `accessmap-data` repo. These are the
-AccessMap-specific software projects used to deploy AccessMap:
+This repo contains all of the infrastructure needed to create and run AccessMap
+except for the data, which can be generated using the `accessmap-data` repo.
+These are the AccessMap-specific software projects used to deploy AccessMap:
 
 - [AccessMap Web App (React-based)](https://github.com/accessmap/accessmap-webapp)
 
@@ -18,272 +18,239 @@ The full pipeline of how AccessMap is deployed can be seen in this diagram:
 
 ## Deployment strategy
 
-AccessMap is currently deployed using `docker-compose`, so the documentation will
-assume some familiarity with the command line and `docker`.
+*Important: outside of deploying Rakam, all of the following steps sould be
+executed in the `accessmap/` subdirectory of this repository.*
 
-AccessMap uses a 3-stage development-staging-production workflow, wherein new ideas
-can be tested out in feature branches, merged to develop, tested on a staged copy
-of the production application, and finally released:
+AccessMap is currently deployed using `docker-compose`, so the documentation
+will assume some familiarity with the command line and `docker`. It uses the
+relatively recent `docker-compose` config version 3.8 or above, which requires
+a newer version of the `docker-compose` CLI (it is developed using version
+1.29).
 
-- New features/branches are developed for the appropriate services, each of which have
-their own repository.
+AccessMap uses a 3-stage development-staging-production workflow, wherein new
+ideas can be tested out in feature branches, merged to develop, tested on a
+staged copy of the production application, and finally released:
 
-- The default deployment mode is `develop`, which will use temporary databases and
-deploy directly from `#develop` branches of each service's repository.
+- New features/branches are developed within each separate repository and
+tested against a deployment of this repository.
 
-- Staging mode is entered by cascading `docker-compose` configs and acts exactly like
-production mode. Different endpoints and databases should be used in staging vs.
-production.
+- Once a given feature or branch is mature, a tagged release is made for that
+service's repository.
 
-- Production mode is entered by cascading `docker-compose` configs.
+- This repository may be updated to refer to those releases as part of internal
+testing and development. This happens on the `develop` branch of this
+repository.
+
+- When we are ready to release a new version of AccessMap to the public, we
+merge the `develop` branch into `master` and tag a new release of this
+repository. Therefore, the latest tagged release on the `master` branch always
+reflects the code running on www.accessmap.io.
+
+If you are running your own deployment of AccessMap, you can, of course, follow
+any release strategy that you prefer and build from any version of our
+services, but this is the primary workflow around which we have designed this
+repository.
 
 ## Configuration
 
-An AccessMap deployment is configured by (1) environment variables and (2) the data
-provided.
+An AccessMap deployment is configured by (1) environment variables and (2)
+networkable pedestrian network feature data.
 
 ### Environment variables
 
 AccessMap uses environment variables to configure its deployments to maximize
-portability and follow best practices. These environment variables can be set at
-runtime (using `source` or explicit `export` commands, for example) or configured using
-a .env file, of which an example is provided at .env.sample.
+portability and follow best practices. These environment variables can be set
+in a number of ways according to the
+[`docker-compose` documentation](https://docs.docker.com/compose/environment-variables/),
+but the easiest is to use an environment file. We provide a template
+environment file, `accessmap.env.sample`, that should be copied to
+`accessmap.env` and can be edited to your needs. The included sample
+environment file documents the purpose and meaning of each environment
+variable.
 
-Environment variables that need to be configured and distinct for different deployments
-(dev, staging, production) are prepended with an environment string. For example, to
-pass the `OSM_CLIENT_ID` setting to a dev environment, set `DEV_OSM_CLIENT_ID`. By
-explicitly separating these deployment configurations, you can ensure your secrets will
-never leak in an inappropriate environment. The following examples do not have the
-prepended environment string, for simplicity:
+### Pedestrian network data
 
-`HOST`: The hostname of the deployment. For development, this is usually localhost,
-though it might sometimes be 0.0.0.0 for tricky dev deployments (e.g., native
-application clients). In staging/production modes, this should usually be a registered
-domain name URI, potentially with a subdomain, e.g. `stage.yourwebsite.com` or
-`yourwebsite.com`. In development mode, this host will be automatically prepended with
-`http://`, while staging and production modes will have `https://`.
-
-`MAPBOX_TOKEN`: An API access token from `mapbox.com`, used to geocode and get basemap
-tiles.
-
-`ANALYTICS`: Whether or not analytics is enabled. Set to "yes" to enable analytics,
-"no" to disable. If set to "no", the two following environment variables do not need to
-be set.
-
-`ANALYTICS_URL`: This does not need to be set in `development` mode, as it is
-assumed to be a local deployment from the `rakam` directory. In staging or production,
-this should be the base URL for the analytics endpoint and it should be secure to
-prevent MITM attacks: either a local URL at an endpoint not exposed to the internet
-(like a closed port) or over HTTPS.
-
-`ANALYTICS_KEY`: The write key for your `rakam` project. See the Analytics section for
-more information.
-
-`OSM_CLIENT_ID`: Your OAuth 1.0a registered application client ID from
-openstreetmap.org. This is used for logins. Keep in mind that development mode uses
-the testing API on openstreetmap.org rather than the main one, so you will need to
-register an application at https://master.apis.dev.openstreetmap.org/ for development
-and https://api.openstreetmap.org for production.
-
-`OSM_CLIENT_SECRET`: Your OAuth 1.0a registered application client secret from
-openstreetmap.org.
-
-`API_SECRET`: The secret to be passed to the API for securing sessions. This should
-be a properly secure hash based on something like `ssh-keygen` and should be a
-closely-guarded secret in both staging and production modes. It should also be unique
-between every mode.
-
-`JWT_SECRET_KEY`: A secret used to sign JWTs, this must also be a secure and unique
-secret generated by something like `ssh-keygen`. JWTs are exposed to clients and a
-poorly-chosen secret could compromise your users' credentials and personal information.
-
-`CONSUMER_CALLBACK_URI`: This is intended to control the redirect after logins occur -
-for AccessMap, this is usually `$HOST/login_callback`. In development mode, this
-defaults to `http://localhost:2015/login_callback`.
-
-`OSM_URI`: This is only really intended for the staging environment, which may need to
-test features in both the OpenStreetMap sandbox and then on the primary OSM deployment.
-It is the base URL for the OpenStreetMap API to use.
-
-### Getting data
-
-For a deployment to work, you need to places two files in the `data/` directory:
-`transportation.geojson` and `regions.geojson`. We would like to publish these data
-so that they can be more easily acquired, but haven't found the right resource to do
-so in a low-cost, versioned manner. Until then, they need to be generated using our
-open source ETL pipelines or shared by our team:
-https://github.com/accessmap/accessmap-data.
+AccessMap requires two data files in the `data/` directory:
+`transportation.geojson` and `regions.geojson`. The data used by AccessMap can
+be generated from scratch using this repository:
+https://github.com/opensidewalks/opensidewalks-data.
 
 #### `transportation.geojson`
 
-This is produced by our open ETL pipeline: https://github.com/accessmap/accessmap-data.
+This should be a GeoJSON file formatted according to the OpenSidewalks Schema
+spec: https://github.com/OpenSidewalks/OpenSidewalks-Schema.
+[Our data pipeline](https://github.com/OpenSidewalks/OpenSidewalks-Schema)
+generates GeoJSON data that conforms to this spec.
 
-This GeoJSON file describes the pedestrian network for a given region and contains
-features like sidewalks, crosswalks, and curb data. It follows the OpenMapTiles tile
-`transportation` layer schema, with a few extensions (read the `accessmap-data` README
-for more information). This will be used as the data for routing in the `unweaver`
-routing engine that powers AccessMap and will become the `transportation` layer in
-the `pedestrian` tileset served by AccessMap.
+The data in such a file will be LineString features representing pedestrian
+pathways as well as metadata that describe them. Where they meet end-to-end,
+AccessMap's routing engine (Unweaver) will network them together.
 
 #### `regions.geojson`
 
-This is produced by our open ETL pipeline: https://github.com/accessmap/accessmap-data.
+This should be a GeoJSON file containing Polygons of service areas. Each
+Feature should have these properties defined:
 
-This GeoJSON file describes the regions served by this instance of AccessMap and is
-auto-generated as part of the `accessmap-data` ETL pipeline. Each feature has a
-geometry (the convex hull) of the region served and has metadata used to define front
-end interactions, such as where to center the map, the name and unique key of the
-region, and its `[W,S,E,N]` bounding box. This data is embedded in the front end via
-the `webapp` service.
+- `key`: A unique string by which the region will be tracked within the web
+application. For example, Seattle's key is `wa.seattle`.
 
+- `name`: A human-readable name for the region. This should be kept short, as
+the UI does not yet adapt well to long names.
+
+- `bounds`: An array of `[West, South, East, North]` coordinates that describe
+the bounding box of the region.
+
+- `lon`: The preferred longitude of the map view starting location for the
+region.
+
+- `lat`: The preferred latitude of the map view starting location for the
+region.
+
+- `zoom`: The preferred map zoom level of the map view starting at the region.
+
+[Our data pipeline](https://github.com/OpenSidewalks/OpenSidewalks-Schema)
+generates a combined regions.geojson file that conforms to this spec.
 
 ## Running a deployment
 
-`docker-compose` has an awkward system for managing different deployment environments:
-cascading config files.
+### Configuration
 
-In addition, there are different stages of an AccessMap deployment, some of which use
-their own configs:
+#### QuickStart
 
-1. Building assets (uses `.build.yml` configs).
-
-2. Running database migrations (uses main configs but requires separate command).
-
-3. Deploying live AccessMap services (uses main configs).
+See the section on setting up the `accessmap.env` file above.
 
 ### Building assets
 
-AccessMap builds data resources as part of its deployment: it compiles the web app
-into a minified set of static assets, creates a graph file for routing, and generates
-vector tiles. Because these steps do not need to be run during every redeployment, they
-are controlled by a separate set of docker-compose files: `docker-compose.build.yml`,
-`docker-compose.staging.yml`, and `docker-compose.prod.yml`. To deploy different
-environments, cascade the configs. Examples:
+#### Quickstart
 
-In development mode:
+Run these three commands:
+    docker-compose run build_webapp
+    docker-compose run build_tiles
+    docker-compose run build_router
 
-    `docker-compose -f docker-compose.build.yml -f docker-compose.build.override.yml up`
+#### Explanation
 
-In staging mode:
+Several assets must be built before deployment: (1) The web application must
+be transpiled and optimized, (2) map vector tiles must be built from the
+input GeoJSON files, and (3) the routable graph must be built from
+`transportation.geojson`.
 
-    `docker-compose -f docker-compose.build.yml -f docker-compose.build.staging.yml up`
+These can be built using `docker-compose run <service>`, where `<service>` is
+the build container name. The build container names are, `build_webapp`,
+`build_tiles`, and `build_router`, so `docker-compose run build_webapp` will
+build the assets for the AccessMap `webapp` container. As an alternative, it
+is also possible to start the service *and* build containers using the `build`
+profile: `docker-compose --profile build up`. Note that the build steps take
+time, so it may be several minutes before the state of the `services` reflects
+the new built assets.
 
-In production mode:
-
-    `docker-compose -f docker-compose.build.yml -f docker-compose.build.prod.yml up`
-
-*Note: the build steps will fail if you haven't added your files to the `data/`
-directory*
+The built assets will be added to the `build/` directory.
 
 ### Database migrations
 
-The user api (`api`) service is stateful and depends on precise table definitions in
-its database that may change over the lifetime of the project. Setting up the database
-can therefore sometimes have two steps: database initialization and database
-migrations. Because running migrations on staging/production databases should be
-carefully curated, database migration is not automatically built into the main
-build/run workflow.
+#### Quickstart
 
-#### Database initialization
+To create and/or migrate the `api` database schemas, just run
+`docker-compose run migrate_api-db`.
 
-During the first time that you create a deployment, you will need to run the migration
-scripts to create the database. You can do this via docker-compose:
+#### Explanation
 
-    docker-compose run api poetry run flask db upgrade
+The user api (`api`) service needs to store user and profile information in an
+SQLAlchemy-compatible database. The sample `accessmap.env` file defines a
+(temporary) sqlite3 endpoint, but in production this should be a dedicated
+server like `postgresql`.
 
-For other environments, make sure to add `-f docker-compose.{environment}.yml` after
-the `docker-compose` command.
-
-#### Running a migration
-
-If you want to update your database to match the latest in AccessMap, you'll need to
-run the same command as above:
-
-    docker-compose run api poetry run flask db upgrade
-
-Be careful about doing such migrations on a production service: you may need to shut
-it down during the migration (or do something complicated).
+Once the database has been defined, its schemas must be created by the `api`
+service. In addition, if the `api` codebase is updated to change any schemas,
+the existing database must be 'migrated' to match it.
 
 ### Running Accessmap services
 
-AccessMap deploys a few long-running services: a reverse proxy that handles HTTPS
-security and routes (caddy), an instance of the routing engine, and an instance of the
-user API. These are also created by cascading configs:
+#### Quickstart - During Development
 
-In development mode:
+Run `docker-compose up`. Alternatively, run `docker-compose up -d` to
+background the compose process.
 
-    `docker-compose -f docker-compose.yml up`
+#### Quickstart - In Production
 
-In staging mode:
+Run `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`.
+Alternatively, run `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
+to background the compose process.
 
-    `docker-compose -f docker-compose.yml -f docker-compose.staging.yml up`
-
-In production mode:
-
-    `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up`
+Note that you may need to set or change your `accessmap.env` file for a
+production set up. See the file for documentation on what to change.
 
 ## Analytics
 
-AccessMap tracks website interactions to do research on user interactions and root out
-bugs. Analytics can be disabled by the user, is not required to deploy AccessMap, and
-can be disabled at the server level using the `ANALYTICS=no` environment variable.
+AccessMap tracks website interactions to do research on user interactions and
+root out bugs. Analytics are disabled from a deployment by default. An
+AccessMap user can also opt out of client-side analytics.
+
+In order to have full control over data provenance (preserve privacy) and
+collect fully custom datasets, AccessMap makes use of a self-hosted instance of
+the [Rakam API](https://github.com/rakam-io/rakam-api). Just like with the
+AccessMap services, this repository provides a `docker-compose`-based
+deployment workflow for Rakam, under the `rakam/` subdirectory.
 
 ### Running rakam
 
-AccessMap uses a self-hosted deployment of `rakam` for its analytics. We chose `rakam`
-because it could be self-hosted (no data shared with third parties) and has a very
-flexible data storage model that works well for doing studies.
-
-You do not need to run your own deployment of `rakam` to enable analytics - you can
-just as easily use the paid rakam service. However, if you want to self-deploy, the
-`rakam` directory contains the `docker-compose` configs you need to get up and running.
+#### During development
 
 In development mode, `rakam` requires no configuration, just run:
 
     docker-compose up -d
 
-In staging and production modes, you should be using a secure production database to
-run `rakam`, so set these environment variables (prepend `STAGING_` or `PROD_`):
+This will create a docker-based `postgresql` database and a self-configuring
+instance of Rakam.
 
-- `RAKAM_CONFIG_LOCK_KEY`: This is a secret used for generating new projects and should
-be treated as root access to the analytics server and database. Make it secret!
+#### In production
 
-- `RAKAM_DB_URL`: The JDBC-compatible database URL. Using SSL is strongly recommended.
-AccessMap uses the postgres driver.
+For production, two environment variables must be configured: one to set the
+URI for a persistent `postgresql` database, ideally defined outside of this
+repository, and a unique secret key that will be used to create and access
+client-side analytics data. These are easiest to configure using a `rakam.env`
+file, for which we have provided a template, `rakam.env.sample`. To use it,
+copy it (`cp rakam.env.sample rakam.env`) and edit with a plain text editor.
+The meaning of each environment variale is described in the sample environment
+file.
+
+To run the software in production mode, we need to skip the `override` file.
+This can be done by running `docker-compose -f docker-compose.yml up`.
 
 ### Getting an analytics project key
 
-`rakam` operates on the basis of "projects", which are isolated namespaces in the
-analytics database. It is a good idea to create a new project for every new study you
-do, e.g. for A/B testing.
+`rakam` operates on the basis of "projects", which are isolated namespaces in
+the analytics database. It is a good idea to create a new project for every new
+study you do, e.g. for A/B testing.
 
-`rakam` uses a web API to manage the creation of projects. To create a new one, you
-need to have the `RAKAM_CONFIG_LOCK__KEY` credential mentioned above and create a
-request to the endpoint. An example in development mode:
+`rakam` uses a web API to manage the creation of projects. To create a new one,
+you need to have the `RAKAM_CONFIG_LOCK__KEY` credential mentioned above and
+create a request to the endpoint. An example in development mode:
 
     curl --request POST --url http://localhost:9999/analytics/project/create -d '{"name": "project1", "lock_key": "mylockKey"}'
 
-Save the response data! At a minimum, you will need to save the write key for use by
-AccessMap. If necessary, you can retrieve these data at a later time directly in the
-database in the `api_key` table.
+Save the response data! At a minimum, you will need to save the write key for
+use by AccessMap. If necessary, you can retrieve these data at a later time
+directly in the database in the `api_key` table.
 
 In the POSTed data, `"name"` is the unique namespace for your new project and
-`"lock_key"` is the secret key (essentially a password) you've defined in your config.
-Make sure to run `rakam` in staging or development mode if it is internet-facing.
+`"lock_key"` is the secret key (essentially a password) you've defined in your
+config. Make sure to run `rakam` in production mode if it is internet-facing.
 
-When AccessMap is also deployed, it proxies requests to `/analytics` to this `rakam`
-instance (if correctly configured), so you can also create new projects at the
-`http(s)://$hostname/analytics/project/create` endpoint.
+When AccessMap is also deployed, it proxies requests to `/analytics` to this
+`rakam` instance (if correctly configured), so you can also create new projects
+at the `http(s)://$hostname/analytics/project/create` endpoint.
 
-Save these credentials! The `write_key` is needed for any project that wants to send
-analytics to this rakam project. If you lose these credentials for any reason, they
-can be accessed at the database backing `rakam` in the `api_key` table.
+Save these credentials! The `write_key` is needed for any project that wants to
+send analytics to this rakam project. If you lose these credentials for any
+reason, they can be accessed at the database backing `rakam` in the `api_key`
+table.
 
 ## Logs
 
-Logging solutions are many, varied, annoying, particularly with docker-based workflows.
-We just deploy on Ubuntu systems and edit /etc/logrotate.d/rsyslog and add the
-following settings under the `/var/log/syslog` section:
+Logging solutions are many, varied, annoying, particularly with docker-based
+workflows. We just deploy on Ubuntu systems and edit /etc/logrotate.d/rsyslog
+and add the following settings under the `/var/log/syslog` section:
 
     rotate 2000
     daily
@@ -299,10 +266,10 @@ following settings under the `/var/log/syslog` section:
 
 Most of these are the default settings as of writing. The import parts are:
 
-1. `rotate 2000` indicates how long to keep logs. Because rotations are daily, this is
-2000 days.
+1. `rotate 2000` indicates how long to keep logs. Because rotations are daily,
+this is 2000 days.
 
-2. `daily` indicates a daily log rotation - a new archived log file will be created
-every day.
+2. `daily` indicates a daily log rotation - a new archived log file will be
+created every day.
 
 3. `dateext` adds the date to the end of the compressed, archived log.

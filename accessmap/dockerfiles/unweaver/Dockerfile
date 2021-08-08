@@ -3,6 +3,8 @@ MAINTAINER Nick Bolten <nbolten@gmail.com>
 
 ARG GIT_HASH="916e63dd3c10d3827133a98bd65bdd67e6692ca8"
 
+ENV SERVER_PORT=5656
+
 RUN apt-get update && \
     apt-get install -y \
       fiona \

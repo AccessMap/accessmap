@@ -10,7 +10,7 @@ services:
     ports:
       - 6666:5432
     volumes:
-      - "${DB_VOLUME:-/docker/rakamdb}:/var/lib/postgresql/data/pgdata"
+      - rakamdb:/var/lib/postgresql/data/pgdata
 
   rakam:
     entrypoint: "bash -c 'while !</dev/tcp/rakamdb/5432; do sleep 1; done; java $JAVA_OPTS -cp /app/lib/*: -Denv=RAKAM_CONFIG org.rakam.ServiceStarter'"
@@ -19,3 +19,6 @@ services:
       - RAKAM_CONFIG_LOCK__KEY=mylockKey
     links:
       - rakamdb
+
+volumes:
+  rakamdb:

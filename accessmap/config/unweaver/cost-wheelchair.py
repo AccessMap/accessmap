@@ -27,8 +27,10 @@ def tobler(grade, k=3.5, m=INCLINE_IDEAL, base=WALK_BASE):
     # Modified to be in meters / second rather than km / h
     return base * math.exp(-k * abs(grade - m))
 
-def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
-                       uphill=0.085, avoidCurbs=True, timestamp=None):
+
+def cost_fun_generator(
+    base_speed=WALK_BASE, downhill=0.1, uphill=0.085, avoidCurbs=True, timestamp=None
+):
     """Calculates a cost-to-travel that balances distance vs. steepness vs.
     needing to cross the street.
 
@@ -45,11 +47,11 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
     k_up = find_k(uphill, INCLINE_IDEAL, DIVISOR)
 
     if timestamp is None:
-        date = datetime.now(pytz.timezone('US/Pacific'))
+        date = datetime.now(pytz.timezone("US/Pacific"))
     else:
         # Unix epoch time is sent in integer format, but is in milliseconds. Divide by
         # 1000
-        date = datetime.fromtimestamp(timestamp / 1000, pytz.timezone('US/Pacific'))
+        date = datetime.fromtimestamp(timestamp / 1000, pytz.timezone("US/Pacific"))
 
     def cost_fun(u, v, d):
         """Cost function that evaluates every edge, returning either a nonnegative cost
@@ -75,18 +77,22 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
         if subclass == "footway":
             if "footway" in d:
                 if d["footway"] == "sidewalk":
-                   # FIXME: this data should be float to begin with
-                   incline = float(d["incline"])
-                   # Decrease speed based on incline
-                   if length > 3:
-                       if incline > uphill:
-                           return None
-                       if incline < -downhill:
-                           return None
-                   if incline > INCLINE_IDEAL:
-                       speed = tobler(incline, k=k_up, m=INCLINE_IDEAL, base=base_speed)
-                   else:
-                       speed = tobler(incline, k=k_down, m=INCLINE_IDEAL, base=base_speed)
+                    # FIXME: this data should be float to begin with
+                    incline = float(d["incline"])
+                    # Decrease speed based on incline
+                    if length > 3:
+                        if incline > uphill:
+                            return None
+                        if incline < -downhill:
+                            return None
+                    if incline > INCLINE_IDEAL:
+                        speed = tobler(
+                            incline, k=k_up, m=INCLINE_IDEAL, base=base_speed
+                        )
+                    else:
+                        speed = tobler(
+                            incline, k=k_down, m=INCLINE_IDEAL, base=base_speed
+                        )
                 elif d["footway"] == "crossing":
                     if avoidCurbs:
                         if "curbramps" in d:
@@ -99,8 +105,8 @@ def cost_fun_generator(base_speed=WALK_BASE, downhill=0.1,
                     # Add delay for crossing street
                     # TODO: tune this based on street type crossed and/or markings.
                     time += 30
-                elif d["elevator"]:
-                    opening_hours = d['opening_hours']
+                elif d.get("elevator", False):
+                    opening_hours = d["opening_hours"]
                     # Add delay for using the elevator
                     time += 45
                     # See if the elevator has limited hours

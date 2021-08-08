@@ -1,0 +1,76 @@
+{$HOST} {
+    tls {$TLS:off}
+
+    root /webapp
+
+    rewrite / {
+      if {path} not_match ^/analytics
+      if {path} not_match ^/api
+      to {path} /
+    }
+
+    proxy /analytics {$ANALYTICS_URL} {
+        without /analytics
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    proxy /api/v1 api:5000 {
+        without /api/v1
+        transparent
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    proxy /api/v1/routing router:5656 {
+        without /api/v1/routing
+        header_downstream Host {host}
+        header_downstream X-Real-IP {remote}
+        header_downstream X-Forwarded-Proto {scheme}
+    }
+
+    gzip
+
+    log stdout
+    errors stderr
+}
+
+{$HOST}/tiles {
+    tls {$TLS:off}
+
+    root /tiles
+
+    header /pedestrian {
+        Access-Control-Allow-Origin *
+        Content-Type application/vnd.mapbox-vector-tile
+        Content-Encoding gzip
+    }
+
+    header /regions {
+        Access-Control-Allow-Origin *
+        Content-Type application/vnd.mapbox-vector-tile
+        Content-Encoding gzip
+    }
+
+    header /tilejson {
+        Content-Type text/plain
+        -Content-Encoding
+    }
+
+    header /nocontent {
+        -Content-Type
+        -Content-Encoding
+    }
+
+    status 204 /nocontent
+
+    rewrite {
+      to {rewrite_path} /nocontent
+    }
+
+    # Log to places that journalctl will find
+    log / stdout "{remote} - {user} [{when}] \"{method} {uri} {proto}\" {status} {size} - {path} -> {rewrite_path}"
+    # errors stderr
+}

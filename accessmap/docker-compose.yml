@@ -1,27 +1,98 @@
-version: '3.2'
+version: '3.8'
+
+x-api-config: &api-config
+  env_file: accessmap.env
+  build:
+    context: https://github.com/accessmap/accessmap-api.git#v0.1.2
+
+x-router-config: &router-config
+  env_file: accessmap.env
+  build: ./dockerfiles/unweaver
+
 
 services:
-  api:
-    build:
-      context: https://github.com/accessmap/accessmap-api.git#develop
-    command: poetry run gunicorn --bind 0.0.0.0:5000 'wsgi:build_app(endpoint="/api/v1")'
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-
-  router:
-    build: ./dockerfiles/unweaver
-    command: poetry run unweaver run /data -h 0.0.0.0 -p 5656
-    volumes:
-      - ./build/router:/data:ro
+#
+# primary services:
+# `docker-compose up`.
+#
 
   caddy:
+    env_file: accessmap.env
     image: abiosoft/caddy:0.11.5-no-stats
+    restart: unless-stopped
     volumes:
-      - ./config/caddy/Caddyfile.shared:/etc/Caddyfile.shared
-      - ./config/caddy/Caddyfile.tiles.shared:/etc/Caddyfile.tiles.shared
+      - ./config/caddy/Caddyfile:/etc/Caddyfile
+      - caddy-persist:/root/.caddy
       - ./build/tiles:/tiles:ro
       - ./build/webapp:/webapp
     links:
       - router
       - api
+
+  api:
+    <<: *api-config
+    command: poetry run gunicorn --bind 0.0.0.0:5000 'wsgi:build_app(endpoint="/api/v1")'
+    restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  router:
+    <<: *router-config
+    command: poetry run unweaver run /data -h 0.0.0.0 -p 5656
+    restart: unless-stopped
+    volumes:
+      - ./build/router:/data:ro
+
+#
+# "migrate" steps - these run database migrations
+# `docker-compose run migrate_api-db`
+#
+  migrate_api_db:
+    <<: *api-config
+    command: sh -c "poetry run flask db upgrade && poetry run flask db migrate"
+    profiles:
+      - migrate
+
+#
+# "build" steps - run these using the "build" profile to create the assets
+# for AccessMap before running the other services.
+# `docker-compose run build_router && docker-compose run build_tiles && docker-compose run build_webapp`
+#
+  build_router:
+    <<: *router-config
+    command: bash -c "cp -r /inputconfig/* /data && cp -r /inputdata/layers /data/ && poetry run unweaver build /data --changes-sign incline"
+    volumes:
+      - ./config/unweaver:/inputconfig:rw
+      - ./data/transportation.geojson:/inputdata/layers/transportation.geojson:ro
+      - ./build/router:/data:rw
+    profiles:
+      - build
+
+  build_tiles:
+    env_file: accessmap.env
+    build: ./dockerfiles/tippecanoe
+    entrypoint: "sh /build_tiles.sh /home/tippecanoe/input /home/tippecanoe/output"
+    volumes:
+      - ./config/tippecanoe/build_tiles.sh:/build_tiles.sh:ro
+      - ./config/tippecanoe/pedestrian-tilejson.json:/home/tippecanoe/pedestrian.json:ro
+      - ./config/tippecanoe/regions-tilejson.json:/home/tippecanoe/regions.json:ro
+      - ./data/transportation.geojson:/home/tippecanoe/input/transportation.geojson:ro
+      - ./data/regions.geojson:/home/tippecanoe/input/regions.geojson:ro
+      - ./build/tiles:/home/tippecanoe/output:rw
+    profiles:
+      - build
+
+  build_webapp:
+    env_file: accessmap.env
+    build:
+      context: https://github.com/accessmap/accessmap-webapp.git#v1.0.6
+    command: npm run build
+    volumes:
+      - ./build/webapp:/www/public
+      - ./data/regions.geojson:/www/regions.json:ro
+    profiles:
+      - build
+
+volumes:
+    caddy-persist:

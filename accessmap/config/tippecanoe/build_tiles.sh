@@ -2,7 +2,6 @@ set -e
 
 inputdir=$1
 outputdir=$2
-host=$3
 
 mkdir -p ${outputdir}/tilejson
 
@@ -14,7 +13,7 @@ tippecanoe -f -Z 6 -z 14 -B 14 -r 2.5 \
     -e ${outputdir}/pedestrian
 
 cp /home/tippecanoe/pedestrian.json ${outputdir}/tilejson/pedestrian.json
-sed -i s,HOSTNAME,${host},g ${outputdir}/tilejson/pedestrian.json
+sed -i s,HOSTNAME,${HOST},g ${outputdir}/tilejson/pedestrian.json
 
 # Build regions layer
 tippecanoe -f -Z 0 -z 14 -B 14 -r 2.5 \
@@ -22,4 +21,4 @@ tippecanoe -f -Z 0 -z 14 -B 14 -r 2.5 \
     -e ${outputdir}/regions
 
 cp /home/tippecanoe/regions.json ${outputdir}/tilejson/regions.json
-sed -i s,HOSTNAME,${host},g ${outputdir}/tilejson/regions.json
+sed -i s,HOSTNAME,${HOST},g ${outputdir}/tilejson/regions.json

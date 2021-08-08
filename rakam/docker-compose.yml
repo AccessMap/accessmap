@@ -2,14 +2,16 @@ version: '3.2'
 
 services:
   rakam:
+    env_file: rakam.env
+    entrypoint: "bash -c 'java $JAVA_OPTS -cp /app/lib/*: -Denv=RAKAM_CONFIG org.rakam.ServiceStarter'"
     image: buremba/rakam@sha256:6cbeaf9429130d7e4987c4b5dd4566d24f0cb05e56a35c9507be3187a73002b8
     ports:
       - 9999:9999
     environment:
+      - RAKAM_CONFIG_HTTP_SERVER_ADDRESS=0.0.0.0:9999
       - RAKAM_CONFIG_STORE_ADAPTER=postgresql
       - RAKAM_CONFIG_CUSTOM__DATA__SOURCE_ENABLED=true
       - RAKAM_CONFIG_EVENT__EXPLORER_ENABLED=true
-      - RAKAM_CONFIG_HTTP_SERVER_ADDRESS=0.0.0.0:9999
       - RAKAM_CONFIG_MODULE_WEBSITE_MAPPER=true
       - RAKAM_CONFIG_MODULE_WEBSITE_MAPPER_USER-AGENT=true
       - RAKAM_CONFIG_MODULE_WEBSITE_MAPPER_REFERRER=true
