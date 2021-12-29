@@ -1,8 +1,8 @@
 # AccessMap
 
-This repo contains all of the infrastructure needed to create and run AccessMap
-except for the data, which can be generated using the `accessmap-data` repo.
-These are the AccessMap-specific software projects used to deploy AccessMap:
+This repo contains all of the infrastructure needed to create and run AccessMap except
+for the data, which can be generated using the `opensidewalks-data` repo. These are the
+AccessMap-specific software projects used to deploy AccessMap:
 
 - [AccessMap Web App (React-based)](https://github.com/accessmap/accessmap-webapp)
 
