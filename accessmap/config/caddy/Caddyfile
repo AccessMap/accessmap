@@ -24,7 +24,7 @@
         header_downstream X-Forwarded-Proto {scheme}
     }
 
-    proxy /api/v1/routing router:5656 {
+    proxy /api/v1/routing unweaver:5656 {
         without /api/v1/routing
         header_downstream Host {host}
         header_downstream X-Real-IP {remote}

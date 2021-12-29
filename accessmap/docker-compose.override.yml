@@ -5,7 +5,7 @@ services:
     ports:
       - 5000:5000
 
-  router:
+  unweaver:
     ports:
       - 5656:5656
 

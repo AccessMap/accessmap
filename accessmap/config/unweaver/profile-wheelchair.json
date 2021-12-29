@@ -1,5 +1,6 @@
 {
   "name": "wheelchair",
+  "id": "wheelchair",
   "args": [
     {
       "name": "avoidCurbs",

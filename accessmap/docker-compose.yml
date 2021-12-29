@@ -5,9 +5,11 @@ x-api-config: &api-config
   build:
     context: https://github.com/accessmap/accessmap-api.git#v0.1.2
 
-x-router-config: &router-config
+x-unweaver-config: &unweaver-config
   env_file: accessmap.env
-  build: ./dockerfiles/unweaver
+  build:
+    context: https://github.com/nbolten/unweaver.git#f37ebb49c83b9818d1f83f907a4e1c8d361918bc
+  stop_signal: SIGINT
 
 
 services:
@@ -26,7 +28,7 @@ services:
       - ./build/tiles:/tiles:ro
       - ./build/webapp:/webapp
     links:
-      - router
+      - unweaver
       - api
 
   api:
@@ -37,12 +39,12 @@ services:
       - 8.8.8.8
       - 8.8.4.4
 
-  router:
-    <<: *router-config
-    command: poetry run unweaver run /data -h 0.0.0.0 -p 5656
+  unweaver:
+    <<: *unweaver-config
+    command: serve /build -h 0.0.0.0 -p 5656
     restart: unless-stopped
     volumes:
-      - ./build/router:/data:ro
+      - ./build/unweaver:/build:rw
 
 #
 # "migrate" steps - these run database migrations
@@ -57,15 +59,17 @@ services:
 #
 # "build" steps - run these using the "build" profile to create the assets
 # for AccessMap before running the other services.
-# `docker-compose run build_router && docker-compose run build_tiles && docker-compose run build_webapp`
+# `docker-compose run build_unweaver && docker-compose run build_tiles && docker-compose run build_webapp`
 #
-  build_router:
-    <<: *router-config
-    command: bash -c "cp -r /inputconfig/* /data && cp -r /inputdata/layers /data/ && poetry run unweaver build /data --changes-sign incline"
+  build_unweaver:
+    <<: *unweaver-config
+    entrypoint: bash -c "mkdir -p /build/layers && cp -r /config/* /build/ && cp /data/transportation.geojson /build/layers/ && unweaver build /build --changes-sign incline"
+    stdin_open: true
+    tty: true
     volumes:
-      - ./config/unweaver:/inputconfig:rw
-      - ./data/transportation.geojson:/inputdata/layers/transportation.geojson:ro
-      - ./build/router:/data:rw
+      - ./config/unweaver:/config:ro
+      - ./data:/data:ro
+      - ./build/unweaver:/build:rw
     profiles:
       - build
 

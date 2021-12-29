@@ -1,24 +1,44 @@
 import copy
+from typing import Iterable
+
+from unweaver.geojson import Feature, Point
+from unweaver.graph_types import EdgeData
+from unweaver.graphs.digraphgpkg import DiGraphGPKGView
 
 
-def directions(origin, destination, cost, nodes, edges):
+def directions(
+    status: str,
+    G: DiGraphGPKGView = None,
+    origin: Feature[Point] = None,
+    destination: Feature[Point] = None,
+    cost: float = None,
+    nodes: Iterable[str] = None,
+    edges: Iterable[EdgeData] = None,
+):
+    if edges is None:
+        return {"code": "No edges"}
+    if cost is None:
+        return {"code": "NoPath"}
     # Extract edge segments and total coordinates of path
-    segments = {"type": "FeatureCollection", "features": []}
-    coords = [edges[0]["_geometry"]["coordinates"][0]]
+    segments = []
+    coords = [list(next(iter(edges))["geom"]["coordinates"][0])]
     total_distance = 0
     for edge in edges:
         if "length" in edge:
             total_distance += edge["length"]
         feature = {
             "type": "Feature",
-            "geometry": edge["_geometry"],
+            "geometry": edge["geom"],
             "properties": {
                 k: v
-                for k, v in edge.items() if k != "_geometry" and v is not None
+                for k, v in edge.items()
+                if k != "geom" and v is not None
             },
         }
-        segments["features"].append(feature)
-        coords += edge["_geometry"]["coordinates"][1:]
+        segments.append(feature)
+        coords += edge["geom"]["coordinates"][1:]
+
+    segment_fc = {"type": "FeatureCollection", "features": segments}
 
     # Extract steps information
     track = [
@@ -37,7 +57,7 @@ def directions(origin, destination, cost, nodes, edges):
             "type": "LineString",
             "coordinates": coords,
         },
-        "segments": segments,
+        "segments": segment_fc,
         "legs": [steps_data],
         "summary": "",
         "duration": int(cost),
@@ -58,14 +78,13 @@ def directions(origin, destination, cost, nodes, edges):
 
 def path_to_directions(edges, track):
     # TODO: add another list of features on which to always 'split' rather than
-    # merge, e.g. multiple edges along one sidewalk should be merged, so way type
-    # should be added.
-    # Iterate over each edge in the path
+    # merge, e.g. multiple edges along one sidewalk should be merged, so way
+    # type should be added.  Iterate over each edge in the path
     steps = []
     for edge in edges:
         # TODO: remove? Might be slow point. Profile!
         edge = copy.deepcopy(edge)
-        geometry = edge.pop("_geometry")
+        geometry = edge.pop("geom")
         step = {
             "type": "Feature",
             "geometry": geometry,
