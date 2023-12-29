@@ -10,6 +10,7 @@ x-unweaver-config: &unweaver-config
   build:
     context: https://github.com/nbolten/unweaver.git#f37ebb49c83b9818d1f83f907a4e1c8d361918bc
   stop_signal: SIGINT
+  platform: linux/x86_64
 
 
 services:
